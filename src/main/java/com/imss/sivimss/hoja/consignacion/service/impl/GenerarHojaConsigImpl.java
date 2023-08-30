@@ -81,7 +81,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
    	}
    	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
 			authentication), EXITO); 
-       if(response.getDatos().toString().contains("id") && response.getCodigo()==200) {
+       if(response.getDatos().toString().contains("id")) {
     	 	return response;
        	//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA FORMATO REGISTRO DE ACTIVIDADES OK", CONSULTA, "authentication", usuario.toString(), "k");
        }else {

@@ -34,6 +34,10 @@ public class GenerarHojaConsig {
 	
 	public DatosRequest buscarArtConsig(DatosRequest request, FiltrosHojaConsignacionRequest filtros,
 			String fecFormat) {
+		String hrInicio= fecInicio +" 00:00:01";
+		String hrFin=fecFin+" 23:59:59";
+		log.info("-->"+hrInicio);
+		log.info(hrFin);
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select( 
@@ -62,22 +66,21 @@ public class GenerarHojaConsig {
 		.join("SVC_VELATORIO SV", "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO");
 		queryUtil.where("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
-		.and("AND PAG.CVE_ESTATUS_PAGO = 5");
+		.and("PAG.CVE_ESTATUS_PAGO = 5");
 		if(filtros.getIdDelegacion()!=null) {
 			queryUtil.where("SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
 		}
 		if(filtros.getIdVelatorio()!=null){
-			queryUtil.where("FORM.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
+			queryUtil.where("SOS.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
 		}
 		if(filtros.getProveedor()!=null){
 			queryUtil.where("PROV.ID_PROVEEDOR = " + filtros.getProveedor()+ "");	
 		}
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("SOS.FEC_ALTA BETWEEN '" + fecInicio+"' 00:00:01" ).and("'"+fecFin+"' 23:59:59");	
+			queryUtil.where("SOS.FEC_ALTA BETWEEN '" + fecInicio+ "'").and("'"+fecFin+"'");
 		}
-		queryUtil.groupBy("FORM.ID_FORMATO_ACTIVIDAD ORDER BY FORM.FEC_ELABORACION ASC");
 		String query = obtieneQuery(queryUtil);
-		log.info("actividades promotores "+query);
+		log.info("hoja consignacion "+query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);
         request.getDatos().remove(AppConstantes.DATOS);
