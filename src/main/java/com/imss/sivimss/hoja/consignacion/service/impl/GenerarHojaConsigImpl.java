@@ -1,0 +1,102 @@
+package com.imss.sivimss.hoja.consignacion.service.impl;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.imss.sivimss.hoja.consignacion.beans.GenerarHojaConsig;
+import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsignacionRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
+import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
+import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
+import com.imss.sivimss.hoja.consignacion.util.LogUtil;
+import com.imss.sivimss.hoja.consignacion.util.ProviderServiceRestTemplate;
+import com.imss.sivimss.hoja.consignacion.util.Response;
+
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Level;
+
+
+
+@Service
+public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
+	
+	@Autowired
+	private LogUtil logUtil;
+
+	@Value("${endpoints.rutas.dominio-consulta}")
+	private String urlConsulta;
+	@Value("${endpoints.rutas.dominio-consulta-paginado}")
+	private String urlPaginado;
+	@Value("${endpoints.rutas.dominio-crear}")
+	private String urlCrear;
+	@Value("${endpoints.rutas.dominio-crear-multiple}")
+	private String urlCrearMultiple;
+	@Value("${endpoints.rutas.dominio-insertar-multiple}")
+	private String urlInsertarMultiple;
+	@Value("${endpoints.rutas.dominio-actualizar}")
+	private String urlActualizar;
+	@Value("${endpoints.ms-reportes}")
+	private String urlReportes;
+	@Value("${formato-fecha}")
+	private String fecFormat;
+	
+	private static final String BAJA = "baja";
+	private static final String ALTA = "alta";
+	private static final String MODIFICACION = "modificacion";
+	private static final String CONSULTA = "consulta";
+	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
+	private static final String EXITO = "EXITO";
+	private static final String IMPRIMIR = "IMPRIMIR";
+
+	@Autowired
+	private ProviderServiceRestTemplate providerRestTemplate;
+	
+	@Autowired
+	private GenerarHojaConsig generarHoja;
+	
+	Gson gson = new Gson();
+	
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@Override
+	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
+	String datosJson = String.valueOf(request.getDatos().get("datos"));
+	FiltrosHojaConsignacionRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsignacionRequest.class);
+
+   	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+   	if(filtros.getFecInicio()!=null) {
+   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
+   		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
+   	}
+   	Response<?> response = providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
+			authentication);
+       if(response.getDatos().toString().contains("id")) {
+       	//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA FORMATO REGISTRO DE ACTIVIDADES OK", CONSULTA, authentication, usuario);
+       }else {
+       	response.setError(true);
+       	response.setMensaje("45");
+       	response.setDatos(null);
+       //	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA, authentication, usuario);
+       } 
+   	return response;
+}
+	
+    public String formatFecha(String fecha) throws ParseException {
+		Date dateF = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
+		DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
+		return fecForma.format(dateF);       
+	}
+	}
+
+
