@@ -18,6 +18,7 @@ import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
 import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
 import com.imss.sivimss.hoja.consignacion.util.LogUtil;
+import com.imss.sivimss.hoja.consignacion.util.MensajeResponseUtil;
 import com.imss.sivimss.hoja.consignacion.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.hoja.consignacion.util.Response;
 
@@ -61,8 +62,8 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
-	@Autowired
-	private GenerarHojaConsig generarHoja;
+
+	GenerarHojaConsig generarHoja= new GenerarHojaConsig();
 	
 	Gson gson = new Gson();
 	
@@ -73,23 +74,24 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
 	String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosHojaConsignacionRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsignacionRequest.class);
-
    	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
    	}
-   	Response<?> response = providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
-			authentication);
-       if(response.getDatos().toString().contains("id")) {
-       	//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA FORMATO REGISTRO DE ACTIVIDADES OK", CONSULTA, authentication, usuario);
+   	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
+			authentication), EXITO); 
+       if(response.getDatos().toString().contains("id") && response.getCodigo()==200) {
+    	 	return response;
+       	//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA FORMATO REGISTRO DE ACTIVIDADES OK", CONSULTA, "authentication", usuario.toString(), "k");
        }else {
        	response.setError(true);
        	response.setMensaje("45");
        	response.setDatos(null);
+       	return response;
        //	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA, authentication, usuario);
        } 
-   	return response;
+  
 }
 	
     public String formatFecha(String fecha) throws ParseException {
