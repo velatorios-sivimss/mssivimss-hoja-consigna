@@ -13,21 +13,27 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.hoja.consignacion.beans.GenerarHojaConsig;
-import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsignacionRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
 import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
+import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
 import com.imss.sivimss.hoja.consignacion.util.LogUtil;
 import com.imss.sivimss.hoja.consignacion.util.MensajeResponseUtil;
 import com.imss.sivimss.hoja.consignacion.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.hoja.consignacion.util.Response;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 
+import javax.xml.bind.DatatypeConverter;
 
 
+@Slf4j
 @Service
 public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	
@@ -73,7 +79,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	@Override
 	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
 	String datosJson = String.valueOf(request.getDatos().get("datos"));
-	FiltrosHojaConsignacionRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsignacionRequest.class);
+	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
    	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
@@ -93,12 +99,38 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
        } 
   
 }
+
+	@Override
+	public Response<?> generarHojaConsig(DatosRequest request, Authentication authentication) 
+			throws IOException, ParseException {
+		Response<?> response = new Response<>();
+		 //JsonParser parser = new JsonParser();
+	     //JsonObject jO = (JsonObject) parser.parse((String) request.getDatos().get(AppConstantes.DATOS));
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		GenerarHojaConsigRequest hojaRequest =  gson.fromJson(datosJson, GenerarHojaConsigRequest.class);	
+		UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		//registrarActividad=new RegistrarActividad(actividadesRequest);
+		generarHoja.setIdUsuario(usuario.getIdUsuario());
+			try {
+				response = providerRestTemplate.consumirServicio(generarHoja.generarHojaConsig(hojaRequest).getDatos(), urlCrearMultiple, authentication);
+					return response;
+			}catch (Exception e) {
+				String consulta = generarHoja.generarHojaConsig(hojaRequest).getDatos().get("query").toString();
+				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+				log.error("Error al ejecutar la query" +encoded);
+			//	logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"error", MODIFICACION, authentication, usuario);
+				throw new IOException("5", e.getCause()) ;
+			}
+	}
+	
+	
 	
     public String formatFecha(String fecha) throws ParseException {
 		Date dateF = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
 		DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
 		return fecForma.format(dateF);       
 	}
+
 	}
 
 

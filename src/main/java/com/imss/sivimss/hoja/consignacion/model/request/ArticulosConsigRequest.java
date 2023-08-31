@@ -14,13 +14,13 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonIgnoreType(value = true)
-public class FiltrosHojaConsignacionRequest {
+public class ArticulosConsigRequest {
 
-	private Integer idVelatorio;
-	private Integer idDelegacion;
+	private Integer idHojaConsig;
 	private String proveedor;
-	private String fecInicio;
-	private String fecFin;
-	private Integer idCatalogo;
-
+	private Integer idOds;
+	private String categoria;
+	private String folioOde;
+	private String paquete;
+	private Double costo;
 }
