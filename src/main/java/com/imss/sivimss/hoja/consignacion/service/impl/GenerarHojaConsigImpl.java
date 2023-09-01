@@ -82,11 +82,11 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 
 	@Override
 	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
-	String datosJson = String.valueOf(request.getDatos().get("datos"));
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
    	if(filtros.getFecInicio()!=null) {
-   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
-   		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
+   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio())+ " 00:00:00");
+   		generarHoja.setFecFin(formatFecha(filtros.getFecFin())+" 23:59:59");
    	}
    	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
 			authentication), EXITO); 
@@ -105,11 +105,10 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
    	}
   
 
-    
-   	@Override
+	@Override
    	public Response<?> buscarHojaConsig(DatosRequest request, Authentication authentication)
    			throws IOException, ParseException {
-   		String datosJson = String.valueOf(request.getDatos().get("datos"));
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
    		FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
    	 Integer pagina = Integer.valueOf(Integer.parseInt(request.getDatos().get("pagina").toString()));
      Integer tamanio = Integer.valueOf(Integer.parseInt(request.getDatos().get("tamanio").toString()));
@@ -170,16 +169,9 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		return response;
 	}
 	
-	
-    public String formatFecha(String fecha) throws ParseException {
-		Date dateF = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
-		DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
-		return fecForma.format(dateF);       
-	}
-
 	@Override
 	public Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException {
-		String datosJson = String.valueOf(request.getDatos().get("datos"));
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		Response<?> response;
 		FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
 		if(filtros.getIdCatalogo()==1) {
@@ -192,7 +184,14 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	   	
 	    	   return response;
 	}
+	
+	 public String formatFecha(String fecha) throws ParseException {
+			Date dateF = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
+			DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
+			return fecForma.format(dateF);       
+		}
 
+	   
 	}
 
 

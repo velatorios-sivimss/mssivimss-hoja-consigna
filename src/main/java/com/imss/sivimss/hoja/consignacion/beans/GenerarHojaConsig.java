@@ -46,10 +46,10 @@ public class GenerarHojaConsig {
 	
 	public DatosRequest buscarArtConsig(DatosRequest request, FiltrosHojaConsigRequest filtros,
 			String fecFormat) {
-		String hrInicio= fecInicio +" 00:00:01";
-		String hrFin=fecFin+" 23:59:59";
-		log.info("-->"+hrInicio);
-		log.info(hrFin);
+		//String hrInicio= fecInicio +" 00:00:01";
+		//String hrFin=fecFin+" 23:59:59";
+		log.info("-->"+fecInicio);
+		log.info(fecFin);
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select( 
@@ -90,7 +90,12 @@ public class GenerarHojaConsig {
 			queryUtil.where("PROV.ID_PROVEEDOR = " + filtros.getIdProveedor()+ "");	
 		}
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("SOS.FEC_ALTA BETWEEN '" + fecInicio+ "'").and("'"+fecFin+"'");
+			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
+			.setParameter("fecInicio", fecInicio);
+		}
+		if(filtros.getFecFin()!=null) {
+			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
+			.setParameter("fecFin", fecFin);
 		}
 		String query = obtieneQuery(queryUtil);
 		log.info("hoja consignacion "+query);
