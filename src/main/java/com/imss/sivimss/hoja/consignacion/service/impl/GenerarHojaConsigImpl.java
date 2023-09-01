@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.imss.sivimss.hoja.consignacion.beans.GenerarHojaConsig;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
 import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
 import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
@@ -122,7 +124,20 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 				throw new IOException("5", e.getCause()) ;
 			}
 	}
+
 	
+	@Override
+	public Response<?> generarReporteHojaConsig(DatosRequest request, Authentication authentication)
+			throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+	//	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		ReporteDto reporte= gson.fromJson(datosJson, ReporteDto.class);
+		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaAfiliacion(reporte.getIdHojaConsig());
+		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
+				authentication);
+		//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE DE ACTIVIDADES", IMPRIMIR, authentication, usuario);
+		return response;
+	}
 	
 	
     public String formatFecha(String fecha) throws ParseException {

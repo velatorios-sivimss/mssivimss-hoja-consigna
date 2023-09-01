@@ -160,4 +160,13 @@ public class GenerarHojaConsig {
         return queryUtil.build();
 	}
 
+	public Map<String, Object> reporteHojaAfiliacion(Integer idHojaConsig) {
+		Map<String, Object> envioDatos = new HashMap<>();
+		envioDatos.put("idHojaConsig", idHojaConsig);
+		envioDatos.put("version", "1.0.0");
+		envioDatos.put("rutaNombreReporte", "reportes/plantilla/Anexo_24_Hoja_De_Consignacion.jrxml");
+		envioDatos.put("tipoReporte", "pdf");
+		return envioDatos;
+	}
+
 }
