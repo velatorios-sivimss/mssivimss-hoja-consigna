@@ -48,6 +48,16 @@ public class GenerarHojaConsigController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
+	@PostMapping("/buscar-hoja-consig")
+	public CompletableFuture<?> buscarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<?> response = generarHojaService.buscarHojaConsig(request,authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}	
+	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
 	@PostMapping("/generar")
 	public CompletableFuture<?> generarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
 		Response<?> response = generarHojaService.generarHojaConsig(request,authentication);

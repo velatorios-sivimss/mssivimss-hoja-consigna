@@ -102,8 +102,38 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
        	return response;
        
        } 
+   	}
   
-}
+
+    
+   	@Override
+   	public Response<?> buscarHojaConsig(DatosRequest request, Authentication authentication)
+   			throws IOException, ParseException {
+   		String datosJson = String.valueOf(request.getDatos().get("datos"));
+   		FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
+   	 Integer pagina = Integer.valueOf(Integer.parseInt(request.getDatos().get("pagina").toString()));
+     Integer tamanio = Integer.valueOf(Integer.parseInt(request.getDatos().get("tamanio").toString()));
+     filtros.setTamanio(tamanio.toString());
+     filtros.setPagina(pagina.toString());
+   	   	if(filtros.getFecInicio()!=null) {
+   	   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
+   	   		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
+   	   	}
+   	   	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarHojaConsig(request, filtros, fecFormat).getDatos(), urlPaginado,
+   				authentication), EXITO); 
+   	       if(response.getDatos().toString().contains("id")) {
+   	    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
+   	    	   return response;
+   	      
+   	       }else {
+   	       	response.setError(true);
+   	       	response.setMensaje("45");
+   	       	response.setDatos(null);
+   	    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
+   	       	return response;
+   	       
+   	       } 
+   	}
 
 	@Override
 	public Response<?> generarHojaConsig(DatosRequest request, Authentication authentication) 
@@ -112,7 +142,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		GenerarHojaConsigRequest hojaRequest =  gson.fromJson(datosJson, GenerarHojaConsigRequest.class);	
 		UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		//registrarActividad=new RegistrarActividad(actividadesRequest);
+		generarHoja=new GenerarHojaConsig(hojaRequest);
 		generarHoja.setIdUsuario(usuario.getIdUsuario());
 			try {
 				response = providerRestTemplate.consumirServicio(generarHoja.generarHojaConsig(hojaRequest).getDatos(), urlCrearMultiple, authentication);
@@ -150,7 +180,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	@Override
 	public Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
-		Response<?> response = new Response<>();
+		Response<?> response;
 		FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
 		if(filtros.getIdCatalogo()==1) {
 		      response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.catalogoProveedores(request, filtros).getDatos(), urlConsulta,
@@ -162,6 +192,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	   	
 	    	   return response;
 	}
+
 	}
 
 

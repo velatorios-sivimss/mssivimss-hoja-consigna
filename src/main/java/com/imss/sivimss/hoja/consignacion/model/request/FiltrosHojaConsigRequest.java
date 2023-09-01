@@ -20,7 +20,10 @@ public class FiltrosHojaConsigRequest {
 	private Integer idDelegacion;
 	private Integer idProveedor;
 	private Integer idCatalogo;
+	private String folio;
 	private String fecInicio;
 	private String fecFin;
+	private String pagina;
+	private String tamanio;
 
 }

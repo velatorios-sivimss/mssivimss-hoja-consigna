@@ -31,9 +31,16 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class GenerarHojaConsig {
 	
+	private Integer idVelatorio;
+	private Integer idProveedor;
 	private String fecInicio;
 	private String fecFin;
 	private Integer idUsuario;
+	
+	public GenerarHojaConsig(GenerarHojaConsigRequest generarHoja) {
+		this.idVelatorio = generarHoja.getIdVelatorio();
+		this.idProveedor = generarHoja.getIdProveedor();
+	}
 	
 	
 	
@@ -94,15 +101,53 @@ public class GenerarHojaConsig {
 		return request;
 	}
 	
+	
+	public DatosRequest buscarHojaConsig(DatosRequest request, FiltrosHojaConsigRequest filtros,
+			String fecFormat) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("HOJ.ID_HOJA_CONSIGNACION AS idHojaConsig",
+				"HOJ.DES_FOLIO AS folio",
+				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') fecElaboracion",
+				"PROV.NOM_PROVEEDOR AS proveedor")
+		.from("SVT_HOJA_CONSIGNACION HOJ")
+		.join("SVT_PROVEEDOR PROV", "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join("SVC_VELATORIO SV", "HOJ.ID_VELATORIO = SV.ID_VELATORIO");
+			queryUtil.where("HOJ.IND_ACTIVO = 1");
+			if(filtros.getIdVelatorio()!=null) {
+				queryUtil.where("HOJ.ID_VELATORIO ="+filtros.getIdVelatorio());
+			}
+			if(filtros.getIdDelegacion()!=null) {
+				queryUtil.where("SV.ID_DELEGACION ="+filtros.getIdDelegacion());
+			}
+			if(filtros.getIdProveedor()!=null) {
+				queryUtil.where("HOJ.ID_PROVEEDOR ="+filtros.getIdProveedor());
+			}
+			if(filtros.getFolio()!=null) {
+				queryUtil.where("HOJ.DES_FOLIO ="+filtros.getFolio());
+			}
+			if(filtros.getFecInicio()!=null) {
+				queryUtil.where("HOJ.FEC_ELABORACION BETWEEN '" + fecInicio+ "'").and("'"+fecFin+"'");
+			}
+		String query = obtieneQuery(queryUtil);
+		log.info("buscar hoja consig "+query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+	    parametros.put("pagina",filtros.getPagina());
+        parametros.put("tamanio",filtros.getTamanio());
+	    request.setDatos(parametros);
+		return request;
+	}
+	
 	public DatosRequest generarHojaConsig(GenerarHojaConsigRequest hojaRequest) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_HOJA_CONSIGNACION");
 		q.agregarParametroValues("DES_FOLIO", "(SELECT CONCAT(LPAD(COUNT(HOJ.ID_HOJA_CONSIGNACION)+1, 4,'0'),'-',(SELECT LPAD(SV.ID_VELATORIO, 2, '0') "
-				+ "FROM SVC_VELATORIO SV WHERE ID_VELATORIO = "+hojaRequest.getIdVelatorio()+")) "
+				+ "FROM SVC_VELATORIO SV WHERE ID_VELATORIO = "+this.idVelatorio+")) "
 				+ "FROM SVT_HOJA_CONSIGNACION HOJ WHERE HOJ.IND_ACTIVO=1)");
-		q.agregarParametroValues("ID_VELATORIO", ""+hojaRequest.getIdVelatorio()+"");
-		q.agregarParametroValues("ID_PROVEEDOR", ""+hojaRequest.getIdProveedor()+"");
+		q.agregarParametroValues("ID_VELATORIO", ""+this.idVelatorio+"");
+		q.agregarParametroValues("ID_PROVEEDOR", ""+this.getIdProveedor()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
 	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
 		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
