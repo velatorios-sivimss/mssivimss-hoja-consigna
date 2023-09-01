@@ -19,8 +19,8 @@ public class FiltrosHojaConsigRequest {
 	private Integer idVelatorio;
 	private Integer idDelegacion;
 	private Integer idProveedor;
+	private Integer idCatalogo;
 	private String fecInicio;
 	private String fecFin;
-	private Integer idCatalogo;
 
 }

@@ -8,11 +8,13 @@ import java.text.SimpleDateFormat;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.hoja.consignacion.beans.GenerarHojaConsig;
+import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
@@ -145,6 +147,21 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		return fecForma.format(dateF);       
 	}
 
+	@Override
+	public Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get("datos"));
+		Response<?> response = new Response<>();
+		FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
+		if(filtros.getIdCatalogo()==1) {
+		      response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.catalogoProveedores(request, filtros).getDatos(), urlConsulta,
+					authentication), EXITO);
+		    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
+		}else {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
+		}
+	   	
+	    	   return response;
+	}
 	}
 
 

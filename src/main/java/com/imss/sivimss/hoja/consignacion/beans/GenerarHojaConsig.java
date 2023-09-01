@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ArticulosConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
@@ -143,6 +144,29 @@ public class GenerarHojaConsig {
 		  parametro.put(AppConstantes.QUERY, encoded);
         request.setDatos(parametro);
         return query;
+	}
+	
+	public DatosRequest catalogoProveedores(DatosRequest request, FiltrosHojaConsigRequest filtros) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PROV.ID_PROVEEDOR",
+				"PROV.NOM_PROVEEDOR")
+		.from("SVT_PROVEEDOR PROV")
+		.join("SVT_CONTRATO SC", "PROV.ID_PROVEEDOR = SC.ID_PROVEEDOR")
+		.join("SVC_VELATORIO SV", "SC.ID_VELATORIO = SV.ID_VELATORIO");
+			queryUtil.where("PROV.ID_TIPO_PROVEEDOR = 2").and("(SC.IND_ACTIVO = 1 OR SC.FEC_FIN_VIG <= CURDATE())");
+			if(filtros.getIdVelatorio()!=null) {
+				queryUtil.where("SC.ID_VELATORIO ="+filtros.getIdVelatorio());
+			}
+			if(filtros.getIdDelegacion()!=null) {
+				queryUtil.where("SV.ID_DELEGACION ="+filtros.getIdDelegacion());
+			}
+		String query = obtieneQuery(queryUtil);
+		log.info("catalogo prov "+query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+		return request;
 	}
 
 	private String setValor(String valor) {
