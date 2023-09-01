@@ -82,7 +82,6 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
 	String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
-   	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
@@ -90,14 +89,16 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
    	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
 			authentication), EXITO); 
        if(response.getDatos().toString().contains("id")) {
-    	 	return response;
-       	//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA FORMATO REGISTRO DE ACTIVIDADES OK", CONSULTA, "authentication", usuario.toString(), "k");
+    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
+    	   return response;
+      
        }else {
        	response.setError(true);
        	response.setMensaje("45");
        	response.setDatos(null);
+    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
        	return response;
-       //	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA, authentication, usuario);
+       
        } 
   
 }
@@ -106,8 +107,6 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	public Response<?> generarHojaConsig(DatosRequest request, Authentication authentication) 
 			throws IOException, ParseException {
 		Response<?> response = new Response<>();
-		 //JsonParser parser = new JsonParser();
-	     //JsonObject jO = (JsonObject) parser.parse((String) request.getDatos().get(AppConstantes.DATOS));
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		GenerarHojaConsigRequest hojaRequest =  gson.fromJson(datosJson, GenerarHojaConsigRequest.class);	
 		UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
@@ -115,12 +114,13 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		generarHoja.setIdUsuario(usuario.getIdUsuario());
 			try {
 				response = providerRestTemplate.consumirServicio(generarHoja.generarHojaConsig(hojaRequest).getDatos(), urlCrearMultiple, authentication);
-					return response;
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"HOJA DE CONSIGNACION GENERADA CORRECTAMENTE", ALTA);	
+				return response;
 			}catch (Exception e) {
 				String consulta = generarHoja.generarHojaConsig(hojaRequest).getDatos().get("query").toString();
 				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 				log.error("Error al ejecutar la query" +encoded);
-			//	logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"error", MODIFICACION, authentication, usuario);
+				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL EJECUTAR LA QUERY", ALTA);
 				throw new IOException("5", e.getCause()) ;
 			}
 	}
@@ -130,12 +130,11 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	public Response<?> generarReporteHojaConsig(DatosRequest request, Authentication authentication)
 			throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-	//	UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		ReporteDto reporte= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaAfiliacion(reporte.getIdHojaConsig());
 		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
-		//logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE DE ACTIVIDADES", IMPRIMIR, authentication, usuario);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
 		return response;
 	}
 	

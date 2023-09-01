@@ -97,8 +97,9 @@ public class GenerarHojaConsig {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_HOJA_CONSIGNACION");
-		//q.agregarParametroValues("DES_FOLIO", "(SELECT CONCAT(LPAD(COUNT(FORM.ID_FORMATO_ACTIVIDAD)+1, 5,'0'),'-',SV.ID_VELATORIO) FROM SVT_FORMATO_ACTIVIDAD_PROMOTORES FORM JOIN SVC_VELATORIO SV ON FORM.ID_VELATORIO = SV.ID_VELATORIO WHERE FORM.ID_VELATORIO = "+this.idVelatorio+" AND FORM.IND_ACTIVO=1)");
-		q.agregarParametroValues("DES_FOLIO", "'0001-01'");
+		q.agregarParametroValues("DES_FOLIO", "(SELECT CONCAT(LPAD(COUNT(HOJ.ID_HOJA_CONSIGNACION)+1, 4,'0'),'-',(SELECT LPAD(SV.ID_VELATORIO, 2, '0') "
+				+ "FROM SVC_VELATORIO SV WHERE ID_VELATORIO = "+hojaRequest.getIdVelatorio()+")) "
+				+ "FROM SVT_HOJA_CONSIGNACION HOJ WHERE HOJ.IND_ACTIVO=1)");
 		q.agregarParametroValues("ID_VELATORIO", ""+hojaRequest.getIdVelatorio()+"");
 		q.agregarParametroValues("ID_PROVEEDOR", ""+hojaRequest.getIdProveedor()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
