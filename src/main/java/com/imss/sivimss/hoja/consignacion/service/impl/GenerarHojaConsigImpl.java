@@ -19,8 +19,11 @@ import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
 import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
+import com.imss.sivimss.hoja.consignacion.model.response.ArticulosConsigResponse;
+import com.imss.sivimss.hoja.consignacion.model.response.HojaConsigResponse;
 import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
+import com.imss.sivimss.hoja.consignacion.util.ConvertirGenerico;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
 import com.imss.sivimss.hoja.consignacion.util.LogUtil;
 import com.imss.sivimss.hoja.consignacion.util.MensajeResponseUtil;
@@ -29,7 +32,9 @@ import com.imss.sivimss.hoja.consignacion.util.Response;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,7 +66,6 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	@Value("${formato-fecha}")
 	private String fecFormat;
 	
-	private static final String BAJA = "baja";
 	private static final String ALTA = "alta";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
@@ -82,26 +86,36 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 
 	@Override
 	public Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException {
-		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+	  	Response<?> response = new Response<>();
+	String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
+	List<HojaConsigResponse> hojaResponse;
+	List<ArticulosConsigResponse> artResponse;
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio())+ " 00:00:00");
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin())+" 23:59:59");
    	}
-   	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,
-			authentication), EXITO); 
-       if(response.getDatos().toString().contains("id")) {
+   	Response<?> responseDatos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication), EXITO); 
+       if(responseDatos.getDatos().toString().contains("id")) {
+    		HojaConsigResponse datosResponse = new HojaConsigResponse();
+    	   hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.datosHojaConsig(request, filtros).getDatos(), urlConsulta,authentication).getDatos(), HojaConsigResponse[].class));
+    	//   artResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication).getDatos(), ArticulosConsigResponse[].class));
+    	  artResponse = Arrays.asList(modelMapper.map(responseDatos.getDatos(), ArticulosConsigResponse[].class));
+    	  datosResponse = hojaResponse.get(0);
+    	  datosResponse.setArtResponse(artResponse);
     	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
-    	   return response;
-      
+    	   response.setCodigo(200);
+           response.setError(false);
+           response.setMensaje("Exito");
+	      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosResponse));
        }else {
+    	   response.setCodigo(200);
        	response.setError(true);
        	response.setMensaje("45");
        	response.setDatos(null);
     	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
-       	return response;
-       
        } 
+       return response;
    	}
   
 
