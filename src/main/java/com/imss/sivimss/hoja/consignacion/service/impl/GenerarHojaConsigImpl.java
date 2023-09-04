@@ -162,12 +162,31 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 			throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporte= gson.fromJson(datosJson, ReporteDto.class);
-		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaAfiliacion(reporte.getIdHojaConsig());
+		if(reporte.getIdHojaConsig()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
+		}
+		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaConsig(reporte.getIdHojaConsig());
 		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
 		return response;
 	}
+	
+	@Override
+	public Response<?> generarReporteConsulta(DatosRequest request, Authentication authentication) throws IOException, ParseException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		ReporteDto reporte= gson.fromJson(datosJson, ReporteDto.class);
+		if(reporte.getFecInicio()!=null) {
+			reporte.setFecInicio(formatFecha(reporte.getFecInicio()));
+   	   		reporte.setFecFin(formatFecha(reporte.getFecFin()));
+		}
+		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteConsultaHojaConsig(reporte);
+		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
+				authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
+		return response;
+	}
+	
 	
 	@Override
 	public Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException {
@@ -190,8 +209,6 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 			DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
 			return fecForma.format(dateF);       
 		}
-
-	   
 	}
 
 

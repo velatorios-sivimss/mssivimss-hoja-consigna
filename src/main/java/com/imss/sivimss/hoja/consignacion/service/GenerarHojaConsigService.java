@@ -20,4 +20,6 @@ public interface GenerarHojaConsigService {
 
 	Response<?> buscarHojaConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
+	Response<?> generarReporteConsulta(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+
 }

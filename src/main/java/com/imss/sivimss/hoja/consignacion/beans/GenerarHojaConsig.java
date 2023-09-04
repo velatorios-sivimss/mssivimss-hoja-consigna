@@ -7,10 +7,10 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ArticulosConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
 import com.imss.sivimss.hoja.consignacion.util.QueryHelper;
@@ -46,10 +46,6 @@ public class GenerarHojaConsig {
 	
 	public DatosRequest buscarArtConsig(DatosRequest request, FiltrosHojaConsigRequest filtros,
 			String fecFormat) {
-		//String hrInicio= fecInicio +" 00:00:01";
-		//String hrFin=fecFin+" 23:59:59";
-		log.info("-->"+fecInicio);
-		log.info(fecFin);
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select( 
@@ -98,7 +94,7 @@ public class GenerarHojaConsig {
 			.setParameter("fecFin", fecFin);
 		}
 		String query = obtieneQuery(queryUtil);
-		log.info("hoja consignacion "+query);
+		log.info("buscar articulos "+query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);
         request.getDatos().remove(AppConstantes.DATOS);
@@ -162,7 +158,7 @@ public class GenerarHojaConsig {
 				//for(int i=0; i<hojaRequest.getArtConsig().size(); i++) {
 					for(ArticulosConsigRequest articulos : hojaRequest.getArtConsig()) {
 				  //      ArticulosConsigRequest articulos = hojaRequest.getArtConsig().get(i);
-						queries.append("$$" + insertarActividades(articulos));
+						queries.append("$$" + insertarArticulosConsig(articulos));
 			}
 			log.info("estoy hojaConsignacion " +query);
 			String encoded = encodedQuery(queries.toString());
@@ -175,7 +171,7 @@ public class GenerarHojaConsig {
 	
 	
 	
-	private String insertarActividades(ArticulosConsigRequest articulos) {
+	private String insertarArticulosConsig(ArticulosConsigRequest articulos) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ARTICULOS_HOJA_CONSIGNACION");
@@ -226,6 +222,44 @@ public class GenerarHojaConsig {
             return "'"+valor+"'";
         }
     }
+
+	public Map<String, Object> reporteHojaConsig(Integer idHojaConsig) {
+		Map<String, Object> envioDatos = new HashMap<>();
+		envioDatos.put("idHojaConsig", idHojaConsig);
+		envioDatos.put("version", "1.0.0");
+		envioDatos.put("rutaNombreReporte", "reportes/plantilla/Anexo_24_Hoja_De_Consignacion.jrxml");
+		envioDatos.put("tipoReporte", "pdf");
+		return envioDatos;
+	}
+	
+	public Map<String, Object> reporteConsultaHojaConsig(ReporteDto reporte) {
+		Map<String, Object> envioDatos = new HashMap<>();
+		StringBuilder condition= new StringBuilder();
+		if(reporte.getIdDelegacion()!=null) {
+			condition.append(" AND SV.ID_DELEGACION = "+reporte.getIdDelegacion()+"");
+		}
+		if(reporte.getIdVelatorio()!=null) {
+			condition.append(" AND HOJ.ID_VELATORIO = "+reporte.getIdVelatorio()+"");
+		}
+		if(reporte.getIdProveedor()!=null) {
+			condition.append(" AND HOJ.ID_PROVEEDOR = "+reporte.getIdProveedor()+"");
+		}
+		if(reporte.getFolio()!=null) {
+			condition.append(" AND HOJ.DES_FOLIO = '"+reporte.getFolio()+"'");
+		}
+		if(reporte.getFecInicio()!=null) {
+			condition.append(" AND HOJ.FEC_ELABORACION BETWEEN '"+reporte.getFecInicio()+"' AND '"+reporte.getFecFin()+"'");
+		}
+		log.info("reporte -> "+condition.toString());
+		envioDatos.put("condition", condition.toString());
+		envioDatos.put("rutaNombreReporte", "reportes/generales/ReporteHojaConsig.jrxml");
+		envioDatos.put("tipoReporte", reporte.getTipoReporte());
+		if(reporte.getTipoReporte().equals("xls")) { 
+			envioDatos.put("IS_IGNORE_PAGINATION", true); 
+			}
+		return envioDatos;
+	}
+
 	
 	private static String encodedQuery(String query) {
         return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
@@ -233,15 +267,6 @@ public class GenerarHojaConsig {
 	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
-	}
-
-	public Map<String, Object> reporteHojaAfiliacion(Integer idHojaConsig) {
-		Map<String, Object> envioDatos = new HashMap<>();
-		envioDatos.put("idHojaConsig", idHojaConsig);
-		envioDatos.put("version", "1.0.0");
-		envioDatos.put("rutaNombreReporte", "reportes/plantilla/Anexo_24_Hoja_De_Consignacion.jrxml");
-		envioDatos.put("tipoReporte", "pdf");
-		return envioDatos;
 	}
 
 }
