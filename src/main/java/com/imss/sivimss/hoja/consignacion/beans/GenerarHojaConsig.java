@@ -73,7 +73,7 @@ public class GenerarHojaConsig {
 		.join("SVC_ORDEN_SERVICIO SOS", "CAR.ID_ORDEN_SERVICIO = SOS.ID_ORDEN_SERVICIO")
 		.join("SVC_VELATORIO SV", "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
-		.leftJoin("SVT_ARTICULOS_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
+		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
 		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
 		.and("PAG.CVE_ESTATUS_PAGO = 5");
 		if(filtros.getIdDelegacion()!=null) {
@@ -160,7 +160,7 @@ public class GenerarHojaConsig {
 				  //      ArticulosConsigRequest articulos = hojaRequest.getArtConsig().get(i);
 						queries.append("$$" + insertarArticulosConsig(articulos));
 			}
-			log.info("estoy hojaConsignacion " +query);
+			log.info("hoja consig " +query);
 			String encoded = encodedQuery(queries.toString());
 				  parametro.put(AppConstantes.QUERY, encoded);
 				  parametro.put("separador","$$");
@@ -174,14 +174,14 @@ public class GenerarHojaConsig {
 	private String insertarArticulosConsig(ArticulosConsigRequest articulos) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ARTICULOS_HOJA_CONSIGNACION");
+		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ART_HOJA_CONSIGNACION");
 		q.agregarParametroValues("ID_HOJA_CONSIGNACION", "idTabla");
 		q.agregarParametroValues("NOM_PROVEEDOR", "'"+articulos.getProveedor()+"'");
 		q.agregarParametroValues("ID_ORDEN_SERVICIO", ""+articulos.getIdOds()+"");
-		q.agregarParametroValues("DES_CATEGORIA_ARTICULO", "'"+articulos.getCategoria()+"'");
+		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
 		q.agregarParametroValues("CVE_FOLIO_ODE", "'"+articulos.getFolioOde()+"'");
-		q.agregarParametroValues("DES_NOM_PAQUETE", "'"+articulos.getPaquete()+"'");
-		q.agregarParametroValues("MON_COSTO_UNITARIO_ARTICULO", ""+articulos.getCosto()+"");
+		q.agregarParametroValues("REF_NOM_PAQUETE", "'"+articulos.getPaquete()+"'");
+		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCosto()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
 		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();
