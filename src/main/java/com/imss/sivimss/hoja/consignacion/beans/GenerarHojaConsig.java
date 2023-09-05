@@ -51,6 +51,7 @@ public class GenerarHojaConsig {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select( 
 				"ART.DES_ARTICULO AS art",
+				"CAR.ID_PAQUETE AS idPaquete",
 				"ART.ID_ARTICULO AS idArticulo",
 				"PROV.ID_PROVEEDOR AS idProvedor",
 				"SOS.ID_ESTATUS_ORDEN_SERVICIO AS estatusOds",
@@ -248,11 +249,11 @@ public class GenerarHojaConsig {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ART_HOJA_CONSIGNACION");
 		q.agregarParametroValues("ID_HOJA_CONSIGNACION", ""+idHojaConsig+"");
-		q.agregarParametroValues("NOM_PROVEEDOR", "'"+articulos.getProveedor()+"'");
+		//q.agregarParametroValues("NOM_PROVEEDOR", "'"+articulos.getProveedor()+"'");
 		q.agregarParametroValues("ID_ORDEN_SERVICIO", ""+articulos.getIdOds()+"");
+		q.agregarParametroValues("ID_PAQUETE", ""+articulos.getIdPaquete()+"");
 		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
 		q.agregarParametroValues("CVE_FOLIO_ODE", "'"+articulos.getFolioOde()+"'");
-		q.agregarParametroValues("REF_NOM_PAQUETE", "'"+articulos.getPaquete()+"'");
 		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCosto()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
 		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");

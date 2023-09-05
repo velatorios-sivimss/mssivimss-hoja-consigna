@@ -21,6 +21,6 @@ public class ArticulosConsigRequest {
 	private Integer idOds;
 	private String categoria;
 	private String folioOde;
-	private String paquete;
+	private Integer idPaquete;
 	private Double costo;
 }
