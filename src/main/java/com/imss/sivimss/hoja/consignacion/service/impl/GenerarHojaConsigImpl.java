@@ -66,6 +66,12 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	@Value("${formato-fecha}")
 	private String fecFormat;
 	
+	@Value("${plantilla.anexo-hoja-consig}")
+	private String anexoHojaConsig;
+	
+	@Value("${generales.reporte-hoja-consig}")
+	private String reporteHojaConsig;
+	
 	private static final String ALTA = "alta";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
@@ -91,30 +97,28 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
 	List<HojaConsigResponse> hojaResponse;
 	List<ArticulosConsigResponse> artResponse;
+	HojaConsigResponse datosResponse;
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio())+ " 00:00:00");
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin())+" 23:59:59");
    	}
    	Response<?> responseDatos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication), EXITO); 
        if(responseDatos.getDatos().toString().contains("id")) {
-    		HojaConsigResponse datosResponse = new HojaConsigResponse();
     	   hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.datosHojaConsig(request, filtros).getDatos(), urlConsulta,authentication).getDatos(), HojaConsigResponse[].class));
     	//   artResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication).getDatos(), ArticulosConsigResponse[].class));
     	  artResponse = Arrays.asList(modelMapper.map(responseDatos.getDatos(), ArticulosConsigResponse[].class));
     	  datosResponse = hojaResponse.get(0);
     	  datosResponse.setArtResponse(artResponse);
     	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
-    	   response.setCodigo(200);
-           response.setError(false);
            response.setMensaje("Exito");
 	      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosResponse));
        }else {
-    	   response.setCodigo(200);
-       	response.setError(true);
        	response.setMensaje("45");
        	response.setDatos(null);
     	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
        } 
+       response.setCodigo(200);
+       response.setError(false);
        return response;
    	}
   
@@ -135,7 +139,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
    	   	Response<?> response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarHojaConsig(request, filtros, fecFormat).getDatos(), urlPaginado,
    				authentication), EXITO); 
    	       if(response.getDatos().toString().contains("id")) {
-   	    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
+   	    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"BUSCAR HOJA CONSIG OK", CONSULTA);
    	    	   return response;
    	      
    	       }else {
@@ -179,10 +183,10 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		if(reporte.getIdHojaConsig()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 		}
-		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaConsig(reporte.getIdHojaConsig());
+		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteHojaConsig(reporte.getIdHojaConsig(), anexoHojaConsig);
 		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECTAMENTE LA HOJA DE COSIGNACION", IMPRIMIR);
 		return response;
 	}
 	
@@ -194,10 +198,10 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 			reporte.setFecInicio(formatFecha(reporte.getFecInicio()));
    	   		reporte.setFecFin(formatFecha(reporte.getFecFin()));
 		}
-		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteConsultaHojaConsig(reporte);
+		Map<String, Object> envioDatos = new GenerarHojaConsig().reporteConsultaHojaConsig(reporte, reporteHojaConsig);
 		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECRAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECTAMENTE EL REPORTE HOJA DE COSIGNACION", IMPRIMIR);
 		return response;
 	}
 	

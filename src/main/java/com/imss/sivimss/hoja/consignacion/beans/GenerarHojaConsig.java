@@ -272,16 +272,16 @@ public class GenerarHojaConsig {
         }
     }
 
-	public Map<String, Object> reporteHojaConsig(Integer idHojaConsig) {
+	public Map<String, Object> reporteHojaConsig(Integer idHojaConsig, String anexo24) {
 		Map<String, Object> envioDatos = new HashMap<>();
 		envioDatos.put("idHojaConsig", idHojaConsig);
 		envioDatos.put("version", "1.0.0");
-		envioDatos.put("rutaNombreReporte", "reportes/plantilla/Anexo_24_Hoja_De_Consignacion.jrxml");
+		envioDatos.put("rutaNombreReporte", anexo24);
 		envioDatos.put("tipoReporte", "pdf");
 		return envioDatos;
 	}
 	
-	public Map<String, Object> reporteConsultaHojaConsig(ReporteDto reporte) {
+	public Map<String, Object> reporteConsultaHojaConsig(ReporteDto reporte, String reporteHojaConsig) {
 		Map<String, Object> envioDatos = new HashMap<>();
 		StringBuilder condition= new StringBuilder();
 		if(reporte.getIdDelegacion()!=null) {
@@ -301,7 +301,7 @@ public class GenerarHojaConsig {
 		}
 		log.info("reporte -> "+condition.toString());
 		envioDatos.put("condition", condition.toString());
-		envioDatos.put("rutaNombreReporte", "reportes/generales/ReporteHojaConsig.jrxml");
+		envioDatos.put("rutaNombreReporte", reporteHojaConsig);
 		envioDatos.put("tipoReporte", reporte.getTipoReporte());
 		if(reporte.getTipoReporte().equals("xls")) { 
 			envioDatos.put("IS_IGNORE_PAGINATION", true); 

@@ -34,6 +34,12 @@ endpoints:
       dominio-actualizar: ${endpoints.mod-catalogos}/actualizar
       dominio-insertar-multiple: ${endpoints.mod-catalogos}/insertarMultiple
       
+plantilla:
+  anexo-hoja-consig: reportes/plantilla/Anexo_24_Hoja_De_Consignacion.jrxml
+ 
+generales:
+   reporte-hoja-consig: reportes/generales/ReporteHojaConsig.jrxml
+      
 jwt:
   secretkey-flujo: ${msit_SECRET_KEY}
   secretkey-dominios: ${msit_SECRET_KEY_DOMINIO}
