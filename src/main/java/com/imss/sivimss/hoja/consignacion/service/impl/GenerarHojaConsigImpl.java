@@ -162,11 +162,20 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		generarHoja=new GenerarHojaConsig(hojaRequest);
 		generarHoja.setIdUsuario(usuario.getIdUsuario());
 			try {
-				response = providerRestTemplate.consumirServicio(generarHoja.generarHojaConsig(hojaRequest).getDatos(), urlCrearMultiple, authentication);
+				response = providerRestTemplate.consumirServicio(generarHoja.generarHojaConsig().getDatos(), urlCrear, authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"HOJA DE CONSIGNACION GENERADA CORRECTAMENTE", ALTA);	
+				if(response.getCodigo()==200) {
+				Integer idHojaConsig = Integer.parseInt(response.getDatos().toString()); 
+				Response<?> responseArticulos =  providerRestTemplate.consumirServicio(generarHoja.insertarArticulos(hojaRequest, idHojaConsig).getDatos(), urlInsertarMultiple, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ARTICULOS AGREGADOS CORRECTAMENTE", ALTA);	
+				response.setCodigo(responseArticulos.getCodigo());
+				response.setMensaje(responseArticulos.getMensaje());
+				response.setError(responseArticulos.getError());
+				}
 				return response;
+			
 			}catch (Exception e) {
-				String consulta = generarHoja.generarHojaConsig(hojaRequest).getDatos().get("query").toString();
+				String consulta = generarHoja.generarHojaConsig().getDatos().get("query").toString();
 				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 				log.error("Error al ejecutar la query" +encoded);
 				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL EJECUTAR LA QUERY", ALTA);

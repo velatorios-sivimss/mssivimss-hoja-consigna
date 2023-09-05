@@ -189,7 +189,7 @@ public class GenerarHojaConsig {
 		return request;
 	}
 	
-	public DatosRequest generarHojaConsig(GenerarHojaConsigRequest hojaRequest) {
+	public DatosRequest generarHojaConsig() {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_HOJA_CONSIGNACION");
@@ -198,11 +198,11 @@ public class GenerarHojaConsig {
 				+ "FROM SVT_HOJA_CONSIGNACION HOJ WHERE HOJ.IND_ACTIVO=1)");
 		q.agregarParametroValues("ID_VELATORIO", ""+this.idVelatorio+"");
 		q.agregarParametroValues("ID_PROVEEDOR", ""+this.getIdProveedor()+"");
-		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
+		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "0");
 	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
 		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();// + "$$" + insertarArticulos(hojaRequest.getArtConsig());
-		StringBuilder queries= new StringBuilder();
+		/*StringBuilder queries= new StringBuilder();
 		queries.append(query);
 				//for(int i=0; i<hojaRequest.getArtConsig().size(); i++) {
 					for(ArticulosConsigRequest articulos : hojaRequest.getArtConsig()) {
@@ -210,21 +210,44 @@ public class GenerarHojaConsig {
 						queries.append("$$" + insertarArticulosConsig(articulos));
 			}
 			log.info("hoja consig " +query);
-			String encoded = encodedQuery(queries.toString());
-				  parametro.put(AppConstantes.QUERY, encoded);
+		
 				  parametro.put("separador","$$");
-			      parametro.put("replace","idTabla");
+			      parametro.put("replace","idTabla");*/
+			      	String encoded = encodedQuery(query);
+				  parametro.put(AppConstantes.QUERY, encoded);
+		        request.setDatos(parametro);
+		return request;
+	}
+	
+	public DatosRequest insertarArticulos(GenerarHojaConsigRequest hojaRequest, Integer idHojaConsig) {
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("UPDATE SVT_HOJA_CONSIGNACION");
+		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
+		q.addWhere("ID_HOJA_CONSIGNACION = "+idHojaConsig);
+		String query = q.obtenerQueryActualizar();
+		StringBuilder queries= new StringBuilder();
+		queries.append(query);
+				//for(int i=0; i<hojaRequest.getArtConsig().size(); i++) {
+					for(ArticulosConsigRequest articulos : hojaRequest.getArtConsig()) {
+				  //      ArticulosConsigRequest articulos = hojaRequest.getArtConsig().get(i);
+						queries.append("$$" + insertarArticulosConsig(articulos, idHojaConsig));
+			}
+			log.info("articulos " +queries);
+			String encoded = encodedQuery(queries.toString());
+			  parametro.put(AppConstantes.QUERY, encoded);
+				  parametro.put("separador","$$");
 		        request.setDatos(parametro);
 		return request;
 	}
 	
 	
 	
-	private String insertarArticulosConsig(ArticulosConsigRequest articulos) {
+	private String insertarArticulosConsig(ArticulosConsigRequest articulos, Integer idHojaConsig) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ART_HOJA_CONSIGNACION");
-		q.agregarParametroValues("ID_HOJA_CONSIGNACION", "idTabla");
+		q.agregarParametroValues("ID_HOJA_CONSIGNACION", ""+idHojaConsig+"");
 		q.agregarParametroValues("NOM_PROVEEDOR", "'"+articulos.getProveedor()+"'");
 		q.agregarParametroValues("ID_ORDEN_SERVICIO", ""+articulos.getIdOds()+"");
 		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
