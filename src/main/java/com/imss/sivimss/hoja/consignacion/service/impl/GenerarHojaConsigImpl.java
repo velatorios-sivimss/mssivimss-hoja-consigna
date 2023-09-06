@@ -182,6 +182,29 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 				throw new IOException("5", e.getCause()) ;
 			}
 	}
+	
+	@Override
+	public Response<?> detalleHojaConsig(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response = new Response<>();
+		String palabra = request.getDatos().get("palabra").toString(); 
+		List<HojaConsigResponse> hojaResponse;
+		List<ArticulosConsigResponse> artResponse;
+		HojaConsigResponse datosResponse;
+		Response<?> responseArticulos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.verDetalleArticulos(request, fecFormat, palabra).getDatos(), urlConsulta,
+					authentication), EXITO);   
+		if(responseArticulos.getCodigo()==200) {
+			hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.detalleHojaConsig(request, fecFormat, palabra ).getDatos(), urlConsulta,authentication).getDatos(), HojaConsigResponse[].class));
+			 artResponse = Arrays.asList(modelMapper.map(responseArticulos.getDatos(), ArticulosConsigResponse[].class));
+			 datosResponse = hojaResponse.get(0);
+			 datosResponse.setArtResponse(artResponse);
+	    	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DETALLE HOJA CONSIGNACION OK", CONSULTA);
+	           response.setMensaje("Exito");
+		      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosResponse));
+		}
+		response.setError(false);
+	        response.setCodigo(200);
+	    	return response;
+	}
 
 	
 	@Override
@@ -236,6 +259,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 			DateFormat fecForma = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
 			return fecForma.format(dateF);       
 		}
+
 	}
 
 

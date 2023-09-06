@@ -190,6 +190,62 @@ public class GenerarHojaConsig {
 		return request;
 	}
 	
+	
+	public DatosRequest verDetalleArticulos(DatosRequest request, String fecFormat, String palabra) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("ART.ID_ORDEN_SERVICIO AS idOds",
+				"ART.ID_PAQUETE AS idPaquete",
+				"PROV.NOM_PROVEEDOR AS proveedor",
+				"ART.REF_CATEGORIA_ART AS categoria",
+				"ART.CVE_FOLIO_ODE AS folioOde",
+				"PAQ.DES_NOM_PAQUETE AS paquete",
+				"ART.IMP_COSTO_UNITARIO_ART AS costo",
+				"DATE_FORMAT(ODS.FEC_ALTA, '"+fecFormat+"') AS fecOds",
+				"ODS.CVE_FOLIO AS folioOds")
+		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.join("SVT_HOJA_CONSIGNACION HOJ", "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
+		.join("SVT_PROVEEDOR PROV ", "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join("SVC_ORDEN_SERVICIO ODS", "ART.ID_ORDEN_SERVICIO = ODS.ID_ORDEN_SERVICIO")
+		.join("SVT_PAQUETE PAQ", "ART.ID_PAQUETE = PAQ.ID_PAQUETE");
+		queryUtil.where("HOJ.IND_ACTIVO=1").and("ART.IND_ACTIVO=1").and
+		("ART.ID_HOJA_CONSIGNACION = " +Integer.parseInt(palabra));
+		String query = obtieneQuery(queryUtil);
+		log.info("formato "+query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+       request.getDatos().remove(AppConstantes.DATOS);
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
+
+
+	public DatosRequest detalleHojaConsig(DatosRequest request, String fecFormat, String palabra) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("COUNT(*) totalArt",
+				"SUM(ART.IMP_COSTO_UNITARIO_ART) AS totalCosto",
+				"HOJ.DES_FOLIO AS folio",
+				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') AS fecElaboracion",
+				"HOJ.TIM_HORA_ELABORACION AS hrElaboracion",
+				"SV.DES_VELATORIO AS velatorio",
+				"SD.DES_DELEGACION AS delegacion")
+		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.join("SVT_HOJA_CONSIGNACION HOJ", "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
+		.join("SVC_VELATORIO SV", "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
+		.join("SVC_DELEGACION SD", "SV.ID_DELEGACION = SD.ID_DELEGACION");
+		queryUtil.where("HOJ.IND_ACTIVO=1").and("ART.IND_ACTIVO=1").and
+		("ART.ID_HOJA_CONSIGNACION = " +Integer.parseInt(palabra));
+		String query = obtieneQuery(queryUtil);
+		log.info("formato "+query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+       request.getDatos().remove(AppConstantes.DATOS);
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
 	public DatosRequest generarHojaConsig() {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
