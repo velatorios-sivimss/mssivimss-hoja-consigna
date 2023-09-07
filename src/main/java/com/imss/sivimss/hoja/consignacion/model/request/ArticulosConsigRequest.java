@@ -22,5 +22,5 @@ public class ArticulosConsigRequest {
 	private String categoria;
 	private String folioOde;
 	private Integer idPaquete;
-	private Double costo;
+	private Double costoConIva;
 }

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ArticulosConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
@@ -49,7 +48,7 @@ public class GenerarHojaConsig {
 			String fecFormat) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select( 
+		queryUtil.select( "ART.ID_ARTICULO AS idArticulo",
 				"ART.DES_ARTICULO AS art",
 				"CAR.ID_PAQUETE AS idPaquete",
 				"ART.ID_ARTICULO AS idArticulo",
@@ -62,7 +61,8 @@ public class GenerarHojaConsig {
 				"PAQ.DES_NOM_PAQUETE AS paquete",
 				"SOE.CVE_FOLIO AS folioOde",
 				"CAT.DES_CATEGORIA_ARTICULO AS categoria",
-				"CON.MON_COSTO_UNITARIO AS costo")
+				"CON.MON_COSTO_UNITARIO AS costoUnitario",
+				"CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16) AS costoConIva")
 		.from("SVC_ORDEN_SERVICIO SOS")
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
 		.join("SVT_PAQUETE PAQ", "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
@@ -111,7 +111,7 @@ public class GenerarHojaConsig {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("ART.ID_ARTICULO AS id",
 				 "COUNT(*) AS totalArt",
-				"SUM(CON.MON_COSTO_UNITARIO) AS totalCosto")
+				"SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)) AS totalCosto")
 		.from("SVC_ORDEN_SERVICIO SOS")
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
 		.join("SVT_PAQUETE PAQ", "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
@@ -310,7 +310,7 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("ID_PAQUETE", ""+articulos.getIdPaquete()+"");
 		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
 		q.agregarParametroValues("CVE_FOLIO_ODE", "'"+articulos.getFolioOde()+"'");
-		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCosto()+"");
+		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCostoConIva()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
 		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();

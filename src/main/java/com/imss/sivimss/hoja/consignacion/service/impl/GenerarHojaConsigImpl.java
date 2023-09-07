@@ -20,6 +20,7 @@ import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
 import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
 import com.imss.sivimss.hoja.consignacion.model.response.ArticulosConsigResponse;
+import com.imss.sivimss.hoja.consignacion.model.response.DatosHojaResponse;
 import com.imss.sivimss.hoja.consignacion.model.response.HojaConsigResponse;
 import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
@@ -95,16 +96,16 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	  	Response<?> response = new Response<>();
 	String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	FiltrosHojaConsigRequest filtros = gson.fromJson(datosJson, FiltrosHojaConsigRequest.class);
-	List<HojaConsigResponse> hojaResponse;
+	List<DatosHojaResponse> hojaResponse;
 	List<ArticulosConsigResponse> artResponse;
-	HojaConsigResponse datosResponse;
+	DatosHojaResponse datosResponse;
    	if(filtros.getFecInicio()!=null) {
    		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio())+ " 00:00:00");
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin())+" 23:59:59");
    	}
    	Response<?> responseDatos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication), EXITO); 
        if(responseDatos.getDatos().toString().contains("id")) {
-    	   hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.datosHojaConsig(request, filtros).getDatos(), urlConsulta,authentication).getDatos(), HojaConsigResponse[].class));
+    	   hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.datosHojaConsig(request, filtros).getDatos(), urlConsulta,authentication).getDatos(), DatosHojaResponse[].class));
     	//   artResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication).getDatos(), ArticulosConsigResponse[].class));
     	  artResponse = Arrays.asList(modelMapper.map(responseDatos.getDatos(), ArticulosConsigResponse[].class));
     	  datosResponse = hojaResponse.get(0);
