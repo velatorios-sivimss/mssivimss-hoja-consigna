@@ -48,6 +48,7 @@ public class GenerarHojaConsig {
 	private static final String SVC_VELATORIO = "SVC_VELATORIO SV";
 	private static final String SVT_PROVEEDOR = "SVT_PROVEEDOR PROV";
 	private static final String SVT_HOJA_CONSIGNACION = "SVT_HOJA_CONSIGNACION HOJ";
+	private static final String SVT_ART_HOJA_CONSIGNACION = "SVT_ART_HOJA_CONSIGNACION ART";
 	
      //ALIAS
 	private static final String PROVEEDOR = " AS proveedor";
@@ -169,10 +170,12 @@ public class GenerarHojaConsig {
 		queryUtil.select("HOJ.ID_HOJA_CONSIGNACION AS idHojaConsig",
 				"HOJ.DES_FOLIO AS folio",
 				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') fecElaboracion",
-				"PROV.NOM_PROVEEDOR" +PROVEEDOR)
+				"PROV.NOM_PROVEEDOR" +PROVEEDOR,
+				"FAC.CVE_FOLIO_FISCAL AS folioFiscal")
 		.from(SVT_HOJA_CONSIGNACION)
 		.join(SVT_PROVEEDOR, "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
-		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO");
+		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
+		.leftJoin("SVT_FACTURA_HOJA_CONSIGNACION FAC", "HOJ.ID_HOJA_CONSIGNACION = FAC.ID_HOJA_CONSIGNACION");
 			queryUtil.where("HOJ.IND_ACTIVO = 1");
 			if(filtros.getIdVelatorio()!=null) {
 				queryUtil.where("HOJ.ID_VELATORIO ="+filtros.getIdVelatorio());
@@ -213,7 +216,7 @@ public class GenerarHojaConsig {
 				"ART.IMP_COSTO_UNITARIO_ART+(ART.IMP_COSTO_UNITARIO_ART*0.16) AS costoConIva",
 				"DATE_FORMAT(ODS.FEC_ALTA, '"+fecFormat+"') AS fecOds",
 				"ODS.CVE_FOLIO AS folioOds")
-		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.from(SVT_ART_HOJA_CONSIGNACION)
 		.join(SVT_HOJA_CONSIGNACION, "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
 		.join("SVT_PROVEEDOR PROV ", "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
 		.join("SVC_ORDEN_SERVICIO ODS", "ART.ID_ORDEN_SERVICIO = ODS.ID_ORDEN_SERVICIO")
@@ -241,7 +244,7 @@ public class GenerarHojaConsig {
 				"HOJ.TIM_HORA_ELABORACION AS hrElaboracion",
 				"SV.DES_VELATORIO AS velatorio",
 				"SD.DES_DELEGACION AS delegacion")
-		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.from(SVT_ART_HOJA_CONSIGNACION)
 		.join(SVT_HOJA_CONSIGNACION, "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
 		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVC_DELEGACION SD", "SV.ID_DELEGACION = SD.ID_DELEGACION");
@@ -414,7 +417,7 @@ public class GenerarHojaConsig {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SUM(ART.IMP_COSTO_UNITARIO_ART)+IFNULL(FAC.IMP_COSTO_TOTAL,0) AS costo")
-		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.from(SVT_ART_HOJA_CONSIGNACION)
 		.leftJoin("SVT_FACTURA_HOJA_CONSIGNACION FAC", "ART.ID_HOJA_CONSIGNACION = FAC.ID_HOJA_CONSIGNACION");
 		queryUtil.where("ART.ID_HOJA_CONSIGNACION = :id")
 				.setParameter("id", idHojaConsig);
@@ -422,7 +425,6 @@ public class GenerarHojaConsig {
 		log.info("buscar articulos "+query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);
-        //request.getDatos().remove(AppConstantes.DATOS);
 	    request.setDatos(parametros);
 		return request;
 	}
