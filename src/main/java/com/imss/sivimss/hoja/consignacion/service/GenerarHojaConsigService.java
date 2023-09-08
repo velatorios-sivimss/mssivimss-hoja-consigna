@@ -24,4 +24,6 @@ public interface GenerarHojaConsigService {
 
 	Response<?> detalleHojaConsig(DatosRequest request, Authentication authentication) throws IOException;
 
+	Response<?> adjuntarFactura(DatosRequest request, Authentication authentication) throws IOException;
+
 }

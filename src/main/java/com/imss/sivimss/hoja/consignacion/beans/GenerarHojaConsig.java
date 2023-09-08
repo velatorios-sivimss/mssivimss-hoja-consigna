@@ -7,7 +7,9 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ArticulosConsigRequest;
+import com.imss.sivimss.hoja.consignacion.model.request.FacturaHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
@@ -168,7 +170,7 @@ public class GenerarHojaConsig {
 		queryUtil.select("HOJ.ID_HOJA_CONSIGNACION AS idHojaConsig",
 				"HOJ.DES_FOLIO AS folio",
 				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') fecElaboracion",
-				"PROV.NOM_PROVEEDOR " +PROVEEDOR)
+				"PROV.NOM_PROVEEDOR" +PROVEEDOR)
 		.from(SVT_HOJA_CONSIGNACION)
 		.join(SVT_PROVEEDOR, "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
 		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO");
@@ -353,14 +355,6 @@ public class GenerarHojaConsig {
 		return request;
 	}
 
-	private String setValor(String valor) {
-        if (valor==null || valor.equals("")) {
-            return "NULL";
-        }else {
-            return "'"+valor+"'";
-        }
-    }
-
 	public Map<String, Object> reporteHojaConsig(Integer idHojaConsig, String anexo24) {
 		Map<String, Object> envioDatos = new HashMap<>();
 		envioDatos.put("idHojaConsig", idHojaConsig);
@@ -397,6 +391,41 @@ public class GenerarHojaConsig {
 			}
 		return envioDatos;
 	}
+	
+	
+	public DatosRequest adjuntarDatosFactura(FacturaHojaConsigRequest facturaRequest) {
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("INSERT INTO SVT_FACTURA_HOJA_CONSIGNACION");
+		q.agregarParametroValues("ID_HOJA_CONSIGNACION", ""+facturaRequest.getIdHojaConsig()+"");
+		q.agregarParametroValues("CVE_FOLIO_FISCAL", "'"+facturaRequest.getFolioFiscal()+"'");
+		q.agregarParametroValues("IMP_COSTO_TOTAL", ""+facturaRequest.getCostoFactura()+"");
+		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
+	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
+		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
+		String query = q.obtenerQueryInsertar();
+			    String encoded = encodedQuery(query);
+				parametro.put(AppConstantes.QUERY, encoded);
+		        request.setDatos(parametro);
+		return request;
+	}
+	
+	public DatosRequest obtenerCosto(Integer idHojaConsig) {
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SUM(ART.IMP_COSTO_UNITARIO_ART) AS costo")
+		.from("SVT_ART_HOJA_CONSIGNACION ART");
+		queryUtil.where("ART.ID_HOJA_CONSIGNACION = :id")
+				.setParameter("id", idHojaConsig);
+		String query = obtieneQuery(queryUtil);
+		log.info("buscar articulos "+query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+        //request.getDatos().remove(AppConstantes.DATOS);
+	    request.setDatos(parametros);
+		return request;
+	}
 
 	
 	private static String encodedQuery(String query) {
@@ -406,5 +435,13 @@ public class GenerarHojaConsig {
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
 	}
+	
+	private String setValor(String valor) {
+        if (valor==null || valor.equals("")) {
+            return "NULL";
+        }else {
+            return "'"+valor+"'";
+        }
+    }
 
 }

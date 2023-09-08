@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.imss.sivimss.hoja.consignacion.beans.GenerarHojaConsig;
 import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
+import com.imss.sivimss.hoja.consignacion.model.request.FacturaHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.GenerarHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteDto;
@@ -238,7 +239,44 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		return response;
 	}
 	
+	@Override
+	public Response<?> adjuntarFactura(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response = new Response<>();
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		FacturaHojaConsigRequest facturaRequest =  gson.fromJson(datosJson, FacturaHojaConsigRequest.class);	
+		UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		generarHoja.setIdUsuario(usuario.getIdUsuario());
+			try {
+				if(validaCostos(facturaRequest.getIdHojaConsig(), authentication)!=facturaRequest.getCostoFactura()) {
+					response.setCodigo(200);
+					response.setError(true);
+					response.setMensaje("30");
+					return response;
+				}
+				 response= providerRestTemplate.consumirServicio(generarHoja.adjuntarDatosFactura(facturaRequest).getDatos(), urlCrear, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"LOS DATOS DE LA FACTURA SE HAN GUARDADO CORRECTAMENTE", ALTA);	
+				return response;
+			}catch (Exception e) {
+				String consulta = generarHoja.adjuntarDatosFactura(facturaRequest).getDatos().get("query").toString();
+				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+				log.error("Error al ejecutar la query" +encoded);
+				logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL EJECUTAR LA QUERY", ALTA);
+				throw new IOException("5", e.getCause()) ;
+			}
+	}
 	
+	
+	@SuppressWarnings("unchecked")
+	private double validaCostos(Integer idHojaConsig, Authentication authentication) throws IOException {
+		List<Map<String, Object>> datos;
+		Response<?> respuesta = providerRestTemplate.consumirServicio(generarHoja.obtenerCosto(idHojaConsig).getDatos(), urlConsulta, authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Validando costos", CONSULTA);	
+		datos = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
+	log.info("costo -> " +(Double)datos.get(0).get("costo"));
+		return (Double)datos.get(0).get("costo");
+	}
+
+
 	@Override
 	public Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
