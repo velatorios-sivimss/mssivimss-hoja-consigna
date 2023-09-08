@@ -42,6 +42,14 @@ public class GenerarHojaConsig {
 		this.idProveedor = generarHoja.getIdProveedor();
 	}
 	
+	//tablas
+	private static final String SVT_PAQUETE = "SVT_PAQUETE PAQ";
+	private static final String SVC_VELATORIO = "SVC_VELATORIO SV";
+	private static final String SVT_PROVEEDOR = "SVT_PROVEEDOR PROV";
+	private static final String SVT_HOJA_CONSIGNACION = "SVT_HOJA_CONSIGNACION HOJ";
+	
+     //ALIAS
+	private static final String PROVEEDOR = " AS proveedor";
 	
 	
 	public DatosRequest buscarArtConsig(DatosRequest request, FiltrosHojaConsigRequest filtros,
@@ -55,7 +63,7 @@ public class GenerarHojaConsig {
 				"PROV.ID_PROVEEDOR AS idProvedor",
 				"SOS.ID_ESTATUS_ORDEN_SERVICIO AS estatusOds",
 				"SOS.ID_ORDEN_SERVICIO AS idOds",
-				"PROV.NOM_PROVEEDOR AS proveedor",
+				"PROV.NOM_PROVEEDOR " +PROVEEDOR,
 				"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds",
 				"SOS.CVE_FOLIO AS folioOds",
 				"PAQ.DES_NOM_PAQUETE AS paquete",
@@ -65,15 +73,15 @@ public class GenerarHojaConsig {
 				"CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16) AS costoConIva")
 		.from("SVC_ORDEN_SERVICIO SOS")
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
-		.join("SVT_PAQUETE PAQ", "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
 		.join("SVC_DETALLE_CARAC_PAQ DET", "CAR.ID_CARAC_PAQUETE = DET.ID_CARAC_PAQUETE")
 		.join("SVT_ARTICULO ART", "DET.ID_ARTICULO = ART.ID_ARTICULO")
 		.join("SVC_CATEGORIA_ARTICULO CAT", "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
 		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
 		.join("SVT_INVENTARIO_ARTICULO INV", "ART.ID_ARTICULO = INV.ID_ARTICULO")
 		.join("SVT_ORDEN_ENTRADA SOE", "INV.ID_ODE = SOE.ID_ODE")
-		.join("SVT_PROVEEDOR PROV", "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
-		.join("SVC_VELATORIO SV", "SOS.ID_VELATORIO = SV.ID_VELATORIO")
+		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
 		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
@@ -114,15 +122,15 @@ public class GenerarHojaConsig {
 				"SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)) AS totalCosto")
 		.from("SVC_ORDEN_SERVICIO SOS")
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
-		.join("SVT_PAQUETE PAQ", "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
 		.join("SVC_DETALLE_CARAC_PAQ DET", "CAR.ID_CARAC_PAQUETE = DET.ID_CARAC_PAQUETE")
 		.join("SVT_ARTICULO ART", "DET.ID_ARTICULO = ART.ID_ARTICULO")
 		.join("SVC_CATEGORIA_ARTICULO CAT", "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
 		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
 		.join("SVT_INVENTARIO_ARTICULO INV", "ART.ID_ARTICULO = INV.ID_ARTICULO")
 		.join("SVT_ORDEN_ENTRADA SOE", "INV.ID_ODE = SOE.ID_ODE")
-		.join("SVT_PROVEEDOR PROV", "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
-		.join("SVC_VELATORIO SV", "SOS.ID_VELATORIO = SV.ID_VELATORIO")
+		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
 		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
@@ -160,10 +168,10 @@ public class GenerarHojaConsig {
 		queryUtil.select("HOJ.ID_HOJA_CONSIGNACION AS idHojaConsig",
 				"HOJ.DES_FOLIO AS folio",
 				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') fecElaboracion",
-				"PROV.NOM_PROVEEDOR AS proveedor")
-		.from("SVT_HOJA_CONSIGNACION HOJ")
-		.join("SVT_PROVEEDOR PROV", "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
-		.join("SVC_VELATORIO SV", "HOJ.ID_VELATORIO = SV.ID_VELATORIO");
+				"PROV.NOM_PROVEEDOR " +PROVEEDOR)
+		.from(SVT_HOJA_CONSIGNACION)
+		.join(SVT_PROVEEDOR, "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO");
 			queryUtil.where("HOJ.IND_ACTIVO = 1");
 			if(filtros.getIdVelatorio()!=null) {
 				queryUtil.where("HOJ.ID_VELATORIO ="+filtros.getIdVelatorio());
@@ -196,18 +204,19 @@ public class GenerarHojaConsig {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("ART.ID_ORDEN_SERVICIO AS idOds",
 				"ART.ID_PAQUETE AS idPaquete",
-				"PROV.NOM_PROVEEDOR AS proveedor",
+				"PROV.NOM_PROVEEDOR"+PROVEEDOR,
 				"ART.REF_CATEGORIA_ART AS categoria",
 				"ART.CVE_FOLIO_ODE AS folioOde",
 				"PAQ.DES_NOM_PAQUETE AS paquete",
-				"ART.IMP_COSTO_UNITARIO_ART AS costo",
+				"ART.IMP_COSTO_UNITARIO_ART AS costoUnitario",
+				"ART.IMP_COSTO_UNITARIO_ART+(ART.IMP_COSTO_UNITARIO_ART*0.16) AS costoConIva",
 				"DATE_FORMAT(ODS.FEC_ALTA, '"+fecFormat+"') AS fecOds",
 				"ODS.CVE_FOLIO AS folioOds")
 		.from("SVT_ART_HOJA_CONSIGNACION ART")
-		.join("SVT_HOJA_CONSIGNACION HOJ", "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
+		.join(SVT_HOJA_CONSIGNACION, "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
 		.join("SVT_PROVEEDOR PROV ", "HOJ.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
 		.join("SVC_ORDEN_SERVICIO ODS", "ART.ID_ORDEN_SERVICIO = ODS.ID_ORDEN_SERVICIO")
-		.join("SVT_PAQUETE PAQ", "ART.ID_PAQUETE = PAQ.ID_PAQUETE");
+		.join(SVT_PAQUETE, "ART.ID_PAQUETE = PAQ.ID_PAQUETE");
 		queryUtil.where("HOJ.IND_ACTIVO=1").and("ART.IND_ACTIVO=1").and
 		("ART.ID_HOJA_CONSIGNACION = " +Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
@@ -232,8 +241,8 @@ public class GenerarHojaConsig {
 				"SV.DES_VELATORIO AS velatorio",
 				"SD.DES_DELEGACION AS delegacion")
 		.from("SVT_ART_HOJA_CONSIGNACION ART")
-		.join("SVT_HOJA_CONSIGNACION HOJ", "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
-		.join("SVC_VELATORIO SV", "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
+		.join(SVT_HOJA_CONSIGNACION, "ART.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
+		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVC_DELEGACION SD", "SV.ID_DELEGACION = SD.ID_DELEGACION");
 		queryUtil.where("HOJ.IND_ACTIVO=1").and("ART.IND_ACTIVO=1").and
 		("ART.ID_HOJA_CONSIGNACION = " +Integer.parseInt(palabra));
@@ -305,7 +314,7 @@ public class GenerarHojaConsig {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ART_HOJA_CONSIGNACION");
 		q.agregarParametroValues("ID_HOJA_CONSIGNACION", ""+idHojaConsig+"");
-		//q.agregarParametroValues("NOM_PROVEEDOR", "'"+articulos.getProveedor()+"'");
+		q.agregarParametroValues("ID_ARTICULO", ""+articulos.getIdArticulo()+"");
 		q.agregarParametroValues("ID_ORDEN_SERVICIO", ""+articulos.getIdOds()+"");
 		q.agregarParametroValues("ID_PAQUETE", ""+articulos.getIdPaquete()+"");
 		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
@@ -324,11 +333,11 @@ public class GenerarHojaConsig {
 	public DatosRequest catalogoProveedores(DatosRequest request, FiltrosHojaConsigRequest filtros) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("PROV.ID_PROVEEDOR",
-				"PROV.NOM_PROVEEDOR")
-		.from("SVT_PROVEEDOR PROV")
+		queryUtil.select("PROV.ID_PROVEEDOR AS idProveedor",
+				"PROV.NOM_PROVEEDOR AS proveedor")
+		.from(SVT_PROVEEDOR)
 		.join("SVT_CONTRATO SC", "PROV.ID_PROVEEDOR = SC.ID_PROVEEDOR")
-		.join("SVC_VELATORIO SV", "SC.ID_VELATORIO = SV.ID_VELATORIO");
+		.join(SVC_VELATORIO, "SC.ID_VELATORIO = SV.ID_VELATORIO");
 			queryUtil.where("PROV.ID_TIPO_PROVEEDOR = 2").and("(SC.IND_ACTIVO = 1 OR SC.FEC_FIN_VIG <= CURDATE())");
 			if(filtros.getIdVelatorio()!=null) {
 				queryUtil.where("SC.ID_VELATORIO ="+filtros.getIdVelatorio());

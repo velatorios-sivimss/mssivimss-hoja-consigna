@@ -16,6 +16,7 @@ import lombok.Setter;
 @JsonIgnoreType(value = true)
 public class ArticulosConsigRequest {
 
+	private Integer idArticulo;
 	private Integer idHojaConsig;
 	private String proveedor;
 	private Integer idOds;
