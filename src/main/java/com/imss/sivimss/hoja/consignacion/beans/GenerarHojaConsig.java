@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ArticulosConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FacturaHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
@@ -414,8 +413,9 @@ public class GenerarHojaConsig {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SUM(ART.IMP_COSTO_UNITARIO_ART) AS costo")
-		.from("SVT_ART_HOJA_CONSIGNACION ART");
+		queryUtil.select("SUM(ART.IMP_COSTO_UNITARIO_ART)+IFNULL(FAC.IMP_COSTO_TOTAL,0) AS costo")
+		.from("SVT_ART_HOJA_CONSIGNACION ART")
+		.leftJoin("SVT_FACTURA_HOJA_CONSIGNACION FAC", "ART.ID_HOJA_CONSIGNACION = FAC.ID_HOJA_CONSIGNACION");
 		queryUtil.where("ART.ID_HOJA_CONSIGNACION = :id")
 				.setParameter("id", idHojaConsig);
 		String query = obtieneQuery(queryUtil);

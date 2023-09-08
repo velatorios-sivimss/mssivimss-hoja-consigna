@@ -272,7 +272,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 		Response<?> respuesta = providerRestTemplate.consumirServicio(generarHoja.obtenerCosto(idHojaConsig).getDatos(), urlConsulta, authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Validando costos", CONSULTA);	
 		datos = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
-	log.info("costo -> " +(Double)datos.get(0).get("costo"));
+	log.info("costo -> " +datos.get(0).get("costo"));
 		return (Double)datos.get(0).get("costo");
 	}
 
