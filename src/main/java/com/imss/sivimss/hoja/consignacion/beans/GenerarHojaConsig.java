@@ -45,6 +45,7 @@ public class GenerarHojaConsig {
 	
 	//tablas
 	private static final String SVT_PAQUETE = "SVT_PAQUETE PAQ";
+	private static final String SVC_ORDEN_SERVICIO = "SVC_ORDEN_SERVICIO SOS";
 	private static final String SVC_VELATORIO = "SVC_VELATORIO SV";
 	private static final String SVT_PROVEEDOR = "SVT_PROVEEDOR PROV";
 	private static final String SVT_HOJA_CONSIGNACION = "SVT_HOJA_CONSIGNACION HOJ";
@@ -58,25 +59,67 @@ public class GenerarHojaConsig {
 			String fecFormat) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select( "ART.ID_ARTICULO AS idArticulo",
-				"ART.DES_ARTICULO AS art",
-				"CAR.ID_PAQUETE AS idPaquete",
-				"ART.ID_ARTICULO AS idArticulo",
-				"PROV.ID_PROVEEDOR AS idProvedor",
-				"SOS.ID_ESTATUS_ORDEN_SERVICIO AS estatusOds",
-				"SOS.ID_ORDEN_SERVICIO AS idOds",
-				"PROV.NOM_PROVEEDOR " +PROVEEDOR,
-				"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds",
-				"SOS.CVE_FOLIO AS folioOds",
-				"PAQ.DES_NOM_PAQUETE AS paquete",
-				"SOE.CVE_FOLIO AS folioOde",
-				"CAT.DES_CATEGORIA_ARTICULO AS categoria",
-				"CON.MON_COSTO_UNITARIO AS costoUnitario",
-				"CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16) AS costoConIva")
-		.from("SVC_ORDEN_SERVICIO SOS")
-		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
-		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
+		String periodo="";
+		StringBuilder where = new StringBuilder();
+		StringBuilder select = new StringBuilder();
+		select.append("ART.ID_ARTICULO AS idArticulo, "
+				+"ART.DES_ARTICULO AS art, "
+				+"CAR.ID_PAQUETE AS idPaquete, "
+				+"ART.ID_ARTICULO AS idArticulo, "
+				+"PROV.ID_PROVEEDOR AS idProvedor, "
+				+"SOS.ID_ESTATUS_ORDEN_SERVICIO AS estatusOds, "
+				+"SOS.ID_ORDEN_SERVICIO AS idOds, "
+				+"PROV.NOM_PROVEEDOR " +PROVEEDOR+", "
+				+"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds, "
+				+"SOS.CVE_FOLIO AS folioOds, "
+				+"PAQ.DES_NOM_PAQUETE AS paquete, "
+				+"SOE.CVE_FOLIO AS folioOde, "
+				+"CAT.DES_CATEGORIA_ARTICULO AS categoria, "
+				+"CON.MON_COSTO_UNITARIO AS costoUnitario, "
+				+"CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16) AS costoConIva");
+		queryUtil.select(select.toString())
+		.from(SVC_ORDEN_SERVICIO)
+		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO=CAR.ID_ORDEN_SERVICIO")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join("SVC_DETALLE_CARAC_PAQ DET", "CAR.ID_CARAC_PAQUETE = DET.ID_CARAC_PAQUETE")
+		.join("SVT_ARTICULO ART", "DET.ID_ARTICULO = ART.ID_ARTICULO ")
+		.join("SVC_CATEGORIA_ARTICULO CAT", "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO")
+		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO")
+		.join("SVT_INVENTARIO_ARTICULO INV", "ART.ID_ARTICULO = INV.ID_ARTICULO ")
+		.join("SVT_ORDEN_ENTRADA SOE", "INV.ID_ODE = SOE.ID_ODE")
+		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR ")
+		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO ")
+		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO ")
+		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO ");
+		where.append(" HOJ.ID_ORDEN_SERVICIO IS NULL AND CAR.IND_ACTIVO=1 AND DET.IND_ACTIVO=1 "
+				+ " AND INV.ID_TIPO_ASIGNACION_ART = 1 AND (SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6) "
+				+ "AND PAG.CVE_ESTATUS_PAGO = 5");
+		if(filtros.getIdDelegacion()!=null) {
+			where.append(" AND SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
+		}
+		if(filtros.getIdVelatorio()!=null){
+			where.append(" AND SOS.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
+		}
+		if(filtros.getIdProveedor()!=null){
+			where.append(" AND DET.ID_PROVEEDOR = " + filtros.getIdProveedor()+ "");	
+		}
+		queryUtil.where(where.toString());
+		if(filtros.getFecInicio()!=null) {
+			periodo = " AND SOS.FEC_ALTA >= '"+fecInicio+"' AND SOS.FEC_ALTA <= '"+fecFin+"'";
+		}
+		//	.setParameter("fecInicio", fecInicio);
+	/*	}
+		if(filtros.getFecFin()!=null) {
+			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
+			.setParameter("fecFin", fecFin);
+		} */
+		SelectQueryUtil queryUtilDos = new SelectQueryUtil();
+		queryUtilDos.select(select.toString())
+		
+		.from(SVC_ORDEN_SERVICIO)
+		.join("SVC_CARAC_PRESUPUESTO CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
+		.join("SVC_DETALLE_CARAC_PRESUP DET", "CAR.ID_CARAC_PRESUPUESTO = DET.ID_CARAC_PRESUPUESTO")
 		.join("SVT_ARTICULO ART", "DET.ID_ARTICULO = ART.ID_ARTICULO")
 		.join("SVC_CATEGORIA_ARTICULO CAT", "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
 		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
@@ -86,29 +129,11 @@ public class GenerarHojaConsig {
 		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
-		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("CAR.IND_ACTIVO=1").and("DET.IND_ACTIVO=1")
-		.and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
-		.and("PAG.CVE_ESTATUS_PAGO = 5");
-		if(filtros.getIdDelegacion()!=null) {
-			queryUtil.where("SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
-		}
-		if(filtros.getIdVelatorio()!=null){
-			queryUtil.where("SOS.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
-		}
-		if(filtros.getIdProveedor()!=null){
-			queryUtil.where("DET.ID_PROVEEDOR = " + filtros.getIdProveedor()+ "");	
-		}
-		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
-			.setParameter("fecInicio", fecInicio);
-		}
-		if(filtros.getFecFin()!=null) {
-			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
-			.setParameter("fecFin", fecFin);
-		}
-		String query = obtieneQuery(queryUtil);
+		queryUtilDos.where(where.toString());
+		final String query = queryUtil.unionAll(queryUtilDos).replace("UNION", periodo+" UNION");
+		//String query = obtieneQuery(queryUtil);
 		log.info("buscar articulos "+query);
-		String encoded = encodedQuery(query);
+		String encoded = encodedQuery(query+periodo);
 	    parametros.put(AppConstantes.QUERY, encoded);
         request.getDatos().remove(AppConstantes.DATOS);
 	    request.setDatos(parametros);
@@ -123,7 +148,7 @@ public class GenerarHojaConsig {
 		queryUtil.select("ART.ID_ARTICULO AS id",
 				 "COUNT(*) AS totalArt",
 				"SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)) AS totalCosto")
-		.from("SVC_ORDEN_SERVICIO SOS")
+		.from(SVC_ORDEN_SERVICIO)
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
 		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
 		.join("SVC_DETALLE_CARAC_PAQ DET", "CAR.ID_CARAC_PAQUETE = DET.ID_CARAC_PAQUETE")
