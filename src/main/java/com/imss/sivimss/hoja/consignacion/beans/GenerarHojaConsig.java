@@ -147,7 +147,7 @@ public class GenerarHojaConsig {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("ART.ID_ARTICULO AS id",
 				 "COUNT(*) AS totalArt",
-				"SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)) AS totalCosto")
+				"IFNULL(SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)),0) AS totalCosto")
 		.from(SVC_ORDEN_SERVICIO)
 		.join("SVC_CARACTERISTICAS_PAQUETE CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
 		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
@@ -161,7 +161,8 @@ public class GenerarHojaConsig {
 		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
 		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
-		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
+		queryUtil.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("CAR.IND_ACTIVO = 1").and("DET.IND_ACTIVO = 1")
+		.and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
 		.and("PAG.CVE_ESTATUS_PAGO = 5");
 		if(filtros.getIdDelegacion()!=null) {
 			queryUtil.where("SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
@@ -180,7 +181,44 @@ public class GenerarHojaConsig {
 			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
 			.setParameter("fecFin", fecFin);
 		}
-		String query = obtieneQuery(queryUtil);
+		SelectQueryUtil queryUtilDos = new SelectQueryUtil();
+		queryUtilDos.select("ART.ID_ARTICULO AS id",
+				 "COUNT(*) AS totalArt",
+				"IFNULL(SUM(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16)),0) AS totalCosto")
+		.from(SVC_ORDEN_SERVICIO)
+		.join("SVC_CARAC_PRESUPUESTO CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
+		.join("SVC_DETALLE_CARAC_PRESUP DET", "CAR.ID_CARAC_PRESUPUESTO = DET.ID_CARAC_PRESUPUESTO")
+		.join("SVT_ARTICULO ART", "DET.ID_ARTICULO = ART.ID_ARTICULO")
+		.join("SVC_CATEGORIA_ARTICULO CAT", "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
+		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
+		.join("SVT_INVENTARIO_ARTICULO INV", "ART.ID_ARTICULO = INV.ID_ARTICULO")
+		.join("SVT_ORDEN_ENTRADA SOE", "INV.ID_ODE = SOE.ID_ODE")
+		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
+		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
+		.join("SVT_PAGO_BITACORA PAG", "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
+		.leftJoin("SVT_ART_HOJA_CONSIGNACION HOJ", "SOS.ID_ORDEN_SERVICIO = HOJ.ID_ORDEN_SERVICIO");
+		queryUtilDos.where("HOJ.ID_ORDEN_SERVICIO IS NULL").and("CAR.IND_ACTIVO = 1").and("DET.IND_ACTIVO = 1")
+		.and("INV.ID_TIPO_ASIGNACION_ART = 1").and("(SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)")
+		.and("PAG.CVE_ESTATUS_PAGO = 5");
+		if(filtros.getIdDelegacion()!=null) {
+			queryUtilDos.where("SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
+		}
+		if(filtros.getIdVelatorio()!=null){
+			queryUtilDos.where("SOS.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
+		}
+		if(filtros.getIdProveedor()!=null){
+			queryUtilDos.where("DET.ID_PROVEEDOR = " + filtros.getIdProveedor()+ "");	
+		}
+		if(filtros.getFecInicio()!=null) {
+			queryUtilDos.where("SOS.FEC_ALTA >= :fecInicio")
+			.setParameter("fecInicio", fecInicio);
+		}
+		if(filtros.getFecFin()!=null) {
+			queryUtilDos.where("SOS.FEC_ALTA <= :fecFin")
+			.setParameter("fecFin", fecFin);
+		}
+		final String query = queryUtil.unionAll(queryUtilDos);
 		log.info("datos "+query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);

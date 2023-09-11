@@ -110,6 +110,10 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
     	//   artResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication).getDatos(), ArticulosConsigResponse[].class));
     	  artResponse = Arrays.asList(modelMapper.map(responseDatos.getDatos(), ArticulosConsigResponse[].class));
     	  datosResponse = hojaResponse.get(0);
+    	  Double costoTotal = hojaResponse.get(0).getTotalCosto()+ hojaResponse.get(1).getTotalCosto();
+    	  Integer totalArticulos = hojaResponse.get(0).getTotalArt()+hojaResponse.get(1).getTotalArt();
+          datosResponse.setTotalCosto(costoTotal);
+    	  datosResponse.setTotalArt(totalArticulos);
     	  datosResponse.setArtResponse(artResponse);
     	   logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA ARTICULOS CONSIGNADOS OK", CONSULTA);
            response.setMensaje("Exito");
