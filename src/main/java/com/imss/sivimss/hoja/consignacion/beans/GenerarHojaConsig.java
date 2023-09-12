@@ -163,7 +163,7 @@ public class GenerarHojaConsig {
 		.join("SVC_DETALLE_CARAC_PAQ DET", "CAR.ID_CARAC_PAQUETE = DET.ID_CARAC_PAQUETE")
 		.join(SVT_ARTICULO, "DET.ID_ARTICULO = ART.ID_ARTICULO")
 		.join(SVC_CATEGORIA_ARTICULO, "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
-		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
+		.join(SVT_CONTRATO_ARTICULOS," ART.ID_ARTICULO = CON.ID_ARTICULO ")
 		.join(SVT_INVENTARIO_ARTICULO, "ART.ID_ARTICULO = INV.ID_ARTICULO")
 		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE")
 		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
@@ -239,7 +239,7 @@ public class GenerarHojaConsig {
 				queryUtil.where("HOJ.ID_PROVEEDOR ="+filtros.getIdProveedor());
 			}
 			if(filtros.getFolio()!=null) {
-				queryUtil.where("HOJ.DES_FOLIO ="+filtros.getFolio());
+				queryUtil.where("HOJ.DES_FOLIO = '"+filtros.getFolio()+"'");
 			}
 			if(filtros.getFecInicio()!=null) {
 				queryUtil.where("HOJ.FEC_ELABORACION BETWEEN '" + fecInicio+ "'").and("'"+fecFin+"'");
