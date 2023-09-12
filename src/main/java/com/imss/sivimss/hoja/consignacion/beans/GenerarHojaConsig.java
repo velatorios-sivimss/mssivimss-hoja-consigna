@@ -92,7 +92,7 @@ public class GenerarHojaConsig {
 		.join(SVC_CATEGORIA_ARTICULO, "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO")
 		.join(SVT_CONTRATO_ARTICULOS," ART.ID_ARTICULO = CON.ID_ARTICULO")
 		.join(SVT_INVENTARIO_ARTICULO, "ART.ID_ARTICULO = INV.ID_ARTICULO ")
-		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE")
+		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE ")
 		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR ")
 		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO ")
 		.join(SVT_PAGO_BITACORA, "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO ")
@@ -101,7 +101,7 @@ public class GenerarHojaConsig {
 				+ " AND INV.ID_TIPO_ASIGNACION_ART = 1 AND (SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6) "
 				+ "AND PAG.CVE_ESTATUS_PAGO = 5");
 		if(filtros.getIdDelegacion()!=null) {
-			where.append(" AND SV.ID_DELEGACION = "+ filtros.getIdDelegacion() + "");
+			where.append(" AND SV.ID_DELEGACION ="+ filtros.getIdDelegacion() + "");
 		}
 		if(filtros.getIdVelatorio()!=null){
 			where.append(" AND SOS.ID_VELATORIO = " + filtros.getIdVelatorio() + "");	
@@ -122,21 +122,20 @@ public class GenerarHojaConsig {
 		SelectQueryUtil queryUtilDos = new SelectQueryUtil();
 		queryUtilDos.select(select.toString())
 		.from(SVC_ORDEN_SERVICIO)
-		.join("SVC_CARAC_PRESUPUESTO CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO")
-		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE ")
-		.join("SVC_DETALLE_CARAC_PRESUP DET", "CAR.ID_CARAC_PRESUPUESTO = DET.ID_CARAC_PRESUPUESTO")
-		.join(SVT_ARTICULO, "DET.ID_ARTICULO = ART.ID_ARTICULO")
-		.join(SVC_CATEGORIA_ARTICULO, "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
-		.join(SVT_CONTRATO_ARTICULOS," ART.ID_ARTICULO = CON.ID_ARTICULO ")
-		.join(SVT_INVENTARIO_ARTICULO, "ART.ID_ARTICULO = INV.ID_ARTICULO")
-		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE")
-		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
-		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO")
-		.join(SVT_PAGO_BITACORA, "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
-		.leftJoin(SVT_ART_HOJA_CONSIGNACION, "SOS.ID_ORDEN_SERVICIO = ARTS.ID_ORDEN_SERVICIO");
+		.join("SVC_CARAC_PRESUPUESTO CAR", "SOS.ID_ORDEN_SERVICIO = CAR.ID_ORDEN_SERVICIO ")
+		.join(SVT_PAQUETE, "CAR.ID_PAQUETE = PAQ.ID_PAQUETE")
+		.join("SVC_DETALLE_CARAC_PRESUP DET", "CAR.ID_CARAC_PRESUPUESTO = DET.ID_CARAC_PRESUPUESTO ")
+		.join(SVT_ARTICULO, "DET.ID_ARTICULO = ART.ID_ARTICULO ")
+		.join(SVC_CATEGORIA_ARTICULO, "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO")
+		.join(SVT_CONTRATO_ARTICULOS," ART.ID_ARTICULO = CON.ID_ARTICULO")
+		.join(SVT_INVENTARIO_ARTICULO, "ART.ID_ARTICULO = INV.ID_ARTICULO ")
+		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE ")
+		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR ")
+		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO ")
+		.join(SVT_PAGO_BITACORA, "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO ")
+		.leftJoin(SVT_ART_HOJA_CONSIGNACION, "SOS.ID_ORDEN_SERVICIO = ARTS.ID_ORDEN_SERVICIO ");
 		queryUtilDos.where(where.toString());
 		final String query = queryUtil.unionAll(queryUtilDos).replace("UNION", periodo+" UNION");
-		//String query = obtieneQuery(queryUtil);
 		log.info("buscar articulos "+query);
 		String encoded = encodedQuery(query+periodo);
 	    parametros.put(AppConstantes.QUERY, encoded);
@@ -185,10 +184,6 @@ public class GenerarHojaConsig {
 		if(filtros.getFecInicio()!=null) {
 			periodo = " AND SOS.FEC_ALTA >= '"+fecInicio+"' AND SOS.FEC_ALTA <= '"+fecFin+"'";
 		}
-	/*	if(filtros.getFecFin()!=null) {
-			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
-			.setParameter("fecFin", fecFin);
-		}*/
 		queryUtil.where(where.toString());
 		SelectQueryUtil queryUtilDos = new SelectQueryUtil();
 		queryUtilDos.select(select.toString())
@@ -198,7 +193,7 @@ public class GenerarHojaConsig {
 		.join("SVC_DETALLE_CARAC_PRESUP DET", "CAR.ID_CARAC_PRESUPUESTO = DET.ID_CARAC_PRESUPUESTO")
 		.join(SVT_ARTICULO, "DET.ID_ARTICULO = ART.ID_ARTICULO")
 		.join(SVC_CATEGORIA_ARTICULO, "ART.ID_CATEGORIA_ARTICULO = CAT.ID_CATEGORIA_ARTICULO ")
-		.join("SVT_CONTRATO_ARTICULOS CON"," ART.ID_ARTICULO = CON.ID_ARTICULO ")
+		.join(SVT_CONTRATO_ARTICULOS," ART.ID_ARTICULO = CON.ID_ARTICULO ")
 		.join(SVT_INVENTARIO_ARTICULO, "ART.ID_ARTICULO = INV.ID_ARTICULO")
 		.join(SVT_ORDEN_ENTRADA, "INV.ID_ODE = SOE.ID_ODE")
 		.join(SVT_PROVEEDOR, "DET.ID_PROVEEDOR = PROV.ID_PROVEEDOR")
@@ -322,7 +317,7 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("ID_PROVEEDOR", ""+this.getIdProveedor()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "0");
 	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
-		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
+		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();// + "$$" + insertarArticulos(hojaRequest.getArtConsig());
 		/*StringBuilder queries= new StringBuilder();
 		queries.append(query);
@@ -377,7 +372,7 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("CVE_FOLIO_ODE", "'"+articulos.getFolioOde()+"'");
 		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCostoConIva()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
-		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
+		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();
 		log.info("insertar articulo -> "+query);
 		  String encoded = encodedQuery(query);
@@ -456,7 +451,7 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("IMP_COSTO_TOTAL", ""+facturaRequest.getCostoFactura()+"");
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "1");
 	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
-		q.agregarParametroValues("FEC_ALTA", "" +AppConstantes.CURRENT_TIMESTAMP +"");
+		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", "" +AppConstantes.CURRENT_TIMESTAMP +"");
 		String query = q.obtenerQueryInsertar();
 			    String encoded = encodedQuery(query);
 				parametro.put(AppConstantes.QUERY, encoded);
