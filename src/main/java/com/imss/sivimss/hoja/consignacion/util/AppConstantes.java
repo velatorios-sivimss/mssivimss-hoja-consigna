@@ -29,7 +29,9 @@ public class AppConstantes {
 	
 	public static final String IND_ACTIVO = "IND_ACTIVO";
 	public static final String CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP()";
+	public static final String FEC_ALTA = "FEC_ALTA";
 
+	
 	private AppConstantes() {
 		throw new IllegalStateException("AppConstantes class");
 	}
