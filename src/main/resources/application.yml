@@ -39,6 +39,9 @@ plantilla:
  
 generales:
    reporte-hoja-consig: ${msit_REPORTE_HOJA_CONSIG} #reportes/generales/ReporteHojaConsig.jrxml
+   
+modulo:
+   reporte-serv-vel: ${msit_REPORTE_SERV_VEL} #reportes/modulo/ReporteServiciosVel.jrxml
       
 jwt:
   secretkey-flujo: ${msit_SECRET_KEY}
