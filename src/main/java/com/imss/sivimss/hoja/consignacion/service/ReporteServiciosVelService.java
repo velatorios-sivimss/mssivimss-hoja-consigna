@@ -12,4 +12,6 @@ public interface ReporteServiciosVelService {
 
 	Response<?> generarReporteServiciosVel(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
+	Response<?> buscarOds(DatosRequest request, Authentication authentication) throws IOException;
+
 }

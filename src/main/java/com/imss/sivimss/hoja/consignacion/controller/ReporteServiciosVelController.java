@@ -46,6 +46,16 @@ public class ReporteServiciosVelController {
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
 	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("/buscar-folio")
+	public CompletableFuture<?> buscarFolioOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<?> response = serviciosVel.buscarOds(request,authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}	
+	
 	
 	/**
 	 * fallbacks generico
