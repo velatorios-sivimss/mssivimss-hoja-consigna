@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteServiciosVelDto;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
@@ -39,14 +38,14 @@ public class ReporteServiciosVel {
 		envioDatos.put("condition", condition.toString());
 		envioDatos.put("rutaNombreReporte", reporteServVel);
 		if(reporte.getId_tipo_reporte()==1) {
-			envioDatos.put("tipoReporte", "pdf");
+			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "pdf");
 		}
 		else if(reporte.getId_tipo_reporte()==2) { 
-			envioDatos.put("tipoReporte", "xls");
+			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "xls");
 			envioDatos.put("IS_IGNORE_PAGINATION", true); 
 			}
-		else {
-			envioDatos.put("tipoReporte", "csv");
+		else if(reporte.getId_tipo_reporte()==3){
+			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "csv");
 		}
 		return envioDatos;
 	}

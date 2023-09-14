@@ -68,6 +68,9 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 			reporte.setFecInicioConsulta(formatFecha(reporte.getFecha_inicial()));
    	   		reporte.setFecFinConsulta(formatFecha(reporte.getFecha_final()));
 		}
+		if(reporte.getId_tipo_reporte()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
+		}
 		Map<String, Object> envioDatos = new ReporteServiciosVel().generarReporte(reporte, reporteServVel);
 		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
