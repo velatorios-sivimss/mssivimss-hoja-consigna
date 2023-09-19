@@ -18,6 +18,8 @@ public class ReporteServiciosVelDto {
 	
 	
 	private Integer id_tipo_reporte;
+	private Integer id_reporte;
+	private String tipoReporte;
 	private Integer id_nivel;
 	private Integer id_velatorio;
 	private Integer id_delegacion;
