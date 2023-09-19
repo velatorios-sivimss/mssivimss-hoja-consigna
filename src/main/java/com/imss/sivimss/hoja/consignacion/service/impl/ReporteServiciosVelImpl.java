@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.imss.sivimss.hoja.consignacion.beans.ReporteServiciosVel;
 import com.imss.sivimss.hoja.consignacion.exception.BadRequestException;
-import com.imss.sivimss.hoja.consignacion.model.request.FiltrosHojaConsigRequest;
 import com.imss.sivimss.hoja.consignacion.model.request.ReporteServiciosVelDto;
 import com.imss.sivimss.hoja.consignacion.service.ReporteServiciosVelService;
 import com.imss.sivimss.hoja.consignacion.util.AppConstantes;
@@ -28,9 +27,7 @@ import com.imss.sivimss.hoja.consignacion.util.MensajeResponseUtil;
 import com.imss.sivimss.hoja.consignacion.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.hoja.consignacion.util.Response;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 	
@@ -68,7 +65,7 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 			reporte.setFecInicioConsulta(formatFecha(reporte.getFecha_inicial()));
    	   		reporte.setFecFinConsulta(formatFecha(reporte.getFecha_final()));
 		}
-		if(reporte.getId_tipo_reporte()==null) {
+		if(reporte.getTipoReporte()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 		}
 		Map<String, Object> envioDatos = new ReporteServiciosVel().generarReporte(reporte, reporteServVel);

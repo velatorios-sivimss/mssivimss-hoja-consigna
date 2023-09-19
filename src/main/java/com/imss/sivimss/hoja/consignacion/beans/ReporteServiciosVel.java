@@ -37,16 +37,11 @@ public class ReporteServiciosVel {
 		log.info("reporte -> "+condition.toString());
 		envioDatos.put("condition", condition.toString());
 		envioDatos.put("rutaNombreReporte", reporteServVel);
-		if(reporte.getId_tipo_reporte()==1) {
-			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "pdf");
-		}
-		else if(reporte.getId_tipo_reporte()==2) { 
+			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", reporte.getTipoReporte());
+		if(reporte.getTipoReporte().equals("xls")) { 
 			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "xls");
 			envioDatos.put("IS_IGNORE_PAGINATION", true); 
 			}
-		else if(reporte.getId_tipo_reporte()==3){
-			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "csv");
-		}
 		return envioDatos;
 	}
 	
