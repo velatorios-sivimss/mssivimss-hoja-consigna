@@ -57,10 +57,10 @@ public class ReporteServiciosVel {
 		.join("SVC_FACTURA FAC", "PAG.ID_PAGO_BITACORA = FAC.ID_PAGO");
 			queryUtil.where("ODS.ID_ESTATUS_ORDEN_SERVICIO = 4").and("PAG.CVE_ESTATUS_PAGO = 5");
 			if(filtros.getId_velatorio()!=null) {
-				queryUtil.where("VEL.ID_VELATORIO  ="+filtros.getId_velatorio());
+				queryUtil.where("ODS.ID_VELATORIO  ="+filtros.getId_velatorio());
 			}
 			if(filtros.getId_delegacion()!=null) {
-				queryUtil.where("SV.ID_DELEGACION ="+filtros.getId_delegacion());
+				queryUtil.where("VEL.ID_DELEGACION ="+filtros.getId_delegacion());
 			}
 			queryUtil.orderBy("ODS.FEC_ALTA ASC");
 		String query = obtieneQuery(queryUtil);

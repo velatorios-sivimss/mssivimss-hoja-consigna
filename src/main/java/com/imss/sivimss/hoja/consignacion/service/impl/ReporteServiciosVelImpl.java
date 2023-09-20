@@ -38,8 +38,6 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 	private String urlConsulta;
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
-	@Value("${formato-fecha}")
-	private String fecFormat;
 	
 	@Value("${modulo.reporte-serv-vel}")
 	private String reporteServVel;
