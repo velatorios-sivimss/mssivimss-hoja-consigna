@@ -26,7 +26,7 @@ public class ReporteServiciosVel {
 			condition.append(" AND ODS.ID_VELATORIO = "+reporte.getId_velatorio()+"");
 		}
 		if(reporte.getId_ods()!=null) {
-			condition.append(" AND ODS.ID_ORDEN_SERVICIO = '"+reporte.getId_ods()+"'");
+			condition.append(" AND ODS.ID_ORDEN_SERVICIO = "+reporte.getId_ods()+"");
 		}
 		if(reporte.getFecha_inicial()!=null) {
 			condition.append(" AND ODS.FEC_ALTA BETWEEN '"+reporte.getFecInicioConsulta()+ " 00:00:01' AND '"+reporte.getFecFinConsulta()+" 23:59:59'");
@@ -39,7 +39,6 @@ public class ReporteServiciosVel {
 		envioDatos.put("rutaNombreReporte", reporteServVel);
 			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", reporte.getTipoReporte());
 		if(reporte.getTipoReporte().equals("xls")) { 
-			envioDatos.put(""+AppConstantes.TIPO_REPORTE+"", "xls");
 			envioDatos.put("IS_IGNORE_PAGINATION", true); 
 			}
 		return envioDatos;
@@ -54,7 +53,7 @@ public class ReporteServiciosVel {
 		.from("SVC_ORDEN_SERVICIO ODS")
 		.join("SVT_PAGO_BITACORA PAG", "ODS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.join("SVC_VELATORIO VEL", "ODS.ID_VELATORIO = VEL.ID_VELATORIO")
-		.join("SVC_FACTURA FAC", "PAG.ID_PAGO_BITACORA = FAC.ID_PAGO");
+		.leftJoin("SVC_FACTURA FAC", "PAG.ID_PAGO_BITACORA = FAC.ID_PAGO");
 			queryUtil.where("ODS.ID_ESTATUS_ORDEN_SERVICIO = 4").and("PAG.CVE_ESTATUS_PAGO = 5");
 			if(filtros.getId_velatorio()!=null) {
 				queryUtil.where("ODS.ID_VELATORIO  ="+filtros.getId_velatorio());
