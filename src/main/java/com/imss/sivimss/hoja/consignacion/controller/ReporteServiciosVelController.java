@@ -50,7 +50,7 @@ public class ReporteServiciosVelController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/buscar-folio")
-	public CompletableFuture<?> buscarFolioOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+	public CompletableFuture<?> buscarFolioOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
 		Response<?> response = serviciosVel.buscarOds(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
