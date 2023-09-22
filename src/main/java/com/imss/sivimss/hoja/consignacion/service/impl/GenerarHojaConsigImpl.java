@@ -255,11 +255,12 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 				if(validaCostos(facturaRequest.getIdHojaConsig(), authentication)!=facturaRequest.getCostoFactura()) {
 					response.setCodigo(200);
 					response.setError(true);
-					response.setMensaje("30");
+					response.setMensaje("150");
 					return response;
 				}
 				 response= providerRestTemplate.consumirServicio(generarHoja.adjuntarDatosFactura(facturaRequest).getDatos(), urlCrear, authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"LOS DATOS DE LA FACTURA SE HAN GUARDADO CORRECTAMENTE", ALTA);	
+			 response.setMensaje("30");
 				return response;
 			}catch (Exception e) {
 				String consulta = generarHoja.adjuntarDatosFactura(facturaRequest).getDatos().get("query").toString();
