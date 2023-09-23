@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class DatosHojaResponse {
-	private Double totalCosto;
+	private String totalCosto;
 	private Integer totalArt;
 	private List<ArticulosConsigResponse> artResponse;
 	

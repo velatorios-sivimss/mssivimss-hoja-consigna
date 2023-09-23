@@ -18,7 +18,7 @@ public class ArticulosConsigResponse {
 	private String fecOds;
 	private String folioOde;
 	private Double costoUnitario;
-	private Double costoConIva;
+	private String costoConIva;
 	private String categoria;
 	private String proveedor;
 	private String paquete;
