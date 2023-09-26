@@ -71,7 +71,6 @@ public class GenerarHojaConsig {
 			String fecFormat) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-	//	String periodo="";
 		StringBuilder where = new StringBuilder();
 		StringBuilder select = new StringBuilder();
 		select.append("ART.ID_ARTICULO AS idArticulo, "
@@ -130,7 +129,7 @@ public class GenerarHojaConsig {
 		if(filtros.getFecFin()!=null) {
 			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
 			.setParameter("fecFin", fecFin);
-		} */
+		} 
 		/*SelectQueryUtil queryUtilDos = new SelectQueryUtil();
 		queryUtilDos.select(select.toString())
 		.from(SVC_ORDEN_SERVICIO)
@@ -146,8 +145,8 @@ public class GenerarHojaConsig {
 		.join(SVC_VELATORIO, "SOS.ID_VELATORIO = SV.ID_VELATORIO ")
 		.join(SVT_PAGO_BITACORA, "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO ").and(ESTATUS_PAGO)
 		.leftJoin(SVT_ART_HOJA_CONSIGNACION, "SOS.ID_ORDEN_SERVICIO = ARTS.ID_ORDEN_SERVICIO ");
-		queryUtilDos.where(where.toString()); */
-		//final String query = queryUtil.unionAll(queryUtilDos).replace("UNION", periodo+" UNION");
+		queryUtilDos.where(where.toString()); 
+		final String query = queryUtil.unionAll(queryUtilDos).replace("UNION", periodo+" UNION"); */
 		String query = obtieneQuery(queryUtil);
 		log.info("buscar articulos "+query);
 		String encoded = encodedQuery(query);
@@ -162,7 +161,6 @@ public class GenerarHojaConsig {
 	public DatosRequest datosHojaConsig(DatosRequest request, FiltrosHojaConsigRequest filtros) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		//String periodo="";
 		StringBuilder where = new StringBuilder();
 		StringBuilder select = new StringBuilder();
 		select.append("ART.ID_ARTICULO AS id, "
@@ -337,8 +335,9 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("" +AppConstantes.IND_ACTIVO+ "", "0");
 	    q.agregarParametroValues("ID_USUARIO_ALTA", "" +idUsuario+ "");
 		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", "" +AppConstantes.CURRENT_TIMESTAMP +"");
-		String query = q.obtenerQueryInsertar();// + "$$" + insertarArticulos(hojaRequest.getArtConsig());
-		/*StringBuilder queries= new StringBuilder();
+		String query = q.obtenerQueryInsertar();
+		/*+ "$$" + insertarArticulos(hojaRequest.getArtConsig());
+		StringBuilder queries= new StringBuilder();
 		queries.append(query);
 				//for(int i=0; i<hojaRequest.getArtConsig().size(); i++) {
 					for(ArticulosConsigRequest articulos : hojaRequest.getArtConsig()) {

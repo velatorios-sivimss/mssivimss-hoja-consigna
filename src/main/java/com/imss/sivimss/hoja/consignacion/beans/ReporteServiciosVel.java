@@ -29,9 +29,12 @@ public class ReporteServiciosVel {
 			condition.append(" AND ODS.ID_ORDEN_SERVICIO = "+reporte.getId_ods()+"");
 		}
 		if(reporte.getFecha_inicial()!=null) {
-			condition.append(" AND ODS.FEC_ALTA BETWEEN '"+reporte.getFecInicioConsulta()+"' AND '"+reporte.getFecFinConsulta()+"'");
+			condition.append(" AND ODS.FEC_ALTA >= '"+reporte.getFecInicioConsulta()+ "'");
 			envioDatos.put("fecInicio", reporte.getFecha_inicial());
+		}
+		if(reporte.getFecha_final()!=null) {
 			envioDatos.put("fecFin", reporte.getFecha_final());
+			condition.append(" AND ODS.FEC_ALTA <= '"+reporte.getFecFinConsulta()+ "'");
 		}
 		condition.append(" ORDER BY ODS.FEC_ALTA ASC");
 		log.info("reporte -> "+condition.toString());
