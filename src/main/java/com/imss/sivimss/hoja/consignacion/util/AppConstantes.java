@@ -28,7 +28,7 @@ public class AppConstantes {
 	public static final String OCURRIO_ERROR_GENERICO = "187";// Ocurrio un error al procesar tu solicitud.
 	
 	public static final String IND_ACTIVO = "IND_ACTIVO";
-	public static final String CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP()";
+	public static final String CURRENT_TIMESTAMP = "CURRENT_DATE()";
 	public static final String FEC_ALTA = "FEC_ALTA";
 	public static final String TIPO_REPORTE = "tipoReporte";
 

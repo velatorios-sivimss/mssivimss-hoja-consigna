@@ -76,7 +76,6 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	private String reporteHojaConsig;
 	
 	private static final String ALTA = "alta";
-	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
 	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	private static final String EXITO = "EXITO";
@@ -102,10 +101,10 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
 	List<ArticulosConsigResponse> artResponse;
 	DatosHojaResponse datosResponse;
    	if(filtros.getFecInicio()!=null) {
-   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio())+ " 00:00:00");
+   		generarHoja.setFecInicio(formatFecha(filtros.getFecInicio()));
    	}
    	if(filtros.getFecFin()!=null) {
-   		generarHoja.setFecFin(formatFecha(filtros.getFecFin())+" 23:59:59");
+   		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
    	}
    	Response<?> responseDatos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication), EXITO); 
        if(responseDatos.getDatos().toString().contains("id")) {

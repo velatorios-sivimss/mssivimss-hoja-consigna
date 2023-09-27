@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 public class HojaConsigResponse {
 	
-	private Double totalCosto;
+	private String totalCosto;
 	private Integer totalArt;
 	private String folio;
 	private String velatorio;
