@@ -115,12 +115,12 @@ public class GenerarHojaConsig {
 		}
 		queryUtil.where(where.toString());
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
-			.setParameter("fecInicio", fecInicio);
+			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') >= :fecInicio")
+			.setParameter("fecInicio", filtros.getFecInicio());
 		}
 		if(filtros.getFecFin()!=null) {
-			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
-			.setParameter("fecFin", fecFin);
+			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') <= :fecFin")
+			.setParameter("fecFin", filtros.getFecFin());
 		}
 		/*periodo = " AND SOS.FEC_ALTA >= '"+fecInicio+"' AND SOS.FEC_ALTA <= '"+fecFin+"'";	
 		.setParameter("fecInicio", fecInicio);
@@ -192,12 +192,12 @@ public class GenerarHojaConsig {
 		}
 		queryUtil.where(where.toString());
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
-			.setParameter("fecInicio", fecInicio);
+			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') >= :fecInicio")
+			.setParameter("fecInicio", filtros.getFecInicio());
 		}
 		if(filtros.getFecFin()!=null) {
-			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
-			.setParameter("fecFin", fecFin);
+			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') <= :fecFin")
+			.setParameter("fecFin", filtros.getFecFin());
 		}
 	/*	SelectQueryUtil queryUtilDos = new SelectQueryUtil();
 		queryUtilDos.select(select.toString())
