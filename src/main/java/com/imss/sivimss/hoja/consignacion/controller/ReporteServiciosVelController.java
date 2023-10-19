@@ -40,8 +40,8 @@ public class ReporteServiciosVelController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/generar")
-	public CompletableFuture<?> generarReporteServiciosVel(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = serviciosVel.generarReporteServiciosVel(request,authentication);
+	public CompletableFuture<Object> generarReporteServiciosVel(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = serviciosVel.generarReporteServiciosVel(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -50,8 +50,8 @@ public class ReporteServiciosVelController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/buscar-folio")
-	public CompletableFuture<?> buscarFolioOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
-		Response<?> response = serviciosVel.buscarOds(request,authentication);
+	public CompletableFuture<Object> buscarFolioOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
+		Response<Object> response = serviciosVel.buscarOds(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	

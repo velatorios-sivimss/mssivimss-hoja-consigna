@@ -39,8 +39,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/buscar-articulos")
-	public CompletableFuture<?> buscarArticulosConsignados(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.buscarArtConsig(request,authentication);
+	public CompletableFuture<Object> buscarArticulosConsignados(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.buscarArtConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -49,8 +49,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/buscar-hoja-consig")
-	public CompletableFuture<?> buscarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.buscarHojaConsig(request,authentication);
+	public CompletableFuture<Object> buscarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.buscarHojaConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -59,8 +59,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/generar")
-	public CompletableFuture<?> generarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.generarHojaConsig(request,authentication);
+	public CompletableFuture<Object> generarHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.generarHojaConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -69,8 +69,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/generar-reporte")
-	public CompletableFuture<?> generarReporteHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.generarReporteHojaConsig(request,authentication);
+	public CompletableFuture<Object> generarReporteHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.generarReporteHojaConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -79,8 +79,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/reporte")
-	public CompletableFuture<?> generarReporteConsultaPrincipal(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.generarReporteConsulta(request,authentication);
+	public CompletableFuture<Object> generarReporteConsultaPrincipal(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.generarReporteConsulta(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -90,8 +90,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/catalogo")
-	public CompletableFuture<?> buscarCatalogo(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
-		Response<?> response = generarHojaService.buscarCatalogo(request,authentication);
+	public CompletableFuture<Object> buscarCatalogo(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+		Response<Object> response = generarHojaService.buscarCatalogo(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -100,8 +100,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/ver-detalle")
-	public CompletableFuture<?> detalleHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
-		Response<?> response = generarHojaService.detalleHojaConsig(request,authentication);
+	public CompletableFuture<Object> detalleHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
+		Response<Object> response = generarHojaService.detalleHojaConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	
@@ -110,8 +110,8 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/adjuntar-factura")
-	public CompletableFuture<?> adjuntarFacturaHojaConsig(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
-		Response<?> response = generarHojaService.adjuntarFactura(request,authentication);
+	public CompletableFuture<Object> adjuntarFacturaHojaConsig(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
+		Response<Object> response = generarHojaService.adjuntarFactura(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}	

@@ -10,8 +10,8 @@ import com.imss.sivimss.hoja.consignacion.util.Response;
 
 public interface ReporteServiciosVelService {
 
-	Response<?> generarReporteServiciosVel(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+	Response<Object> generarReporteServiciosVel(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
-	Response<?> buscarOds(DatosRequest request, Authentication authentication) throws IOException;
+	Response<Object> buscarOds(DatosRequest request, Authentication authentication) throws IOException;
 
 }
