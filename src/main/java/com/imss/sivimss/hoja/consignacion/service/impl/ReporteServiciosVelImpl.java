@@ -46,6 +46,7 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	private static final String EXITO = "EXITO";
 	private static final String IMPRIMIR = "IMPRIMIR";
+	private static final String ERROR_DESCARGA= "52";
 	
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -55,7 +56,7 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 	Gson gson = new Gson();
 	
 	@Override
-	public Response<?> generarReporteServiciosVel(DatosRequest request, Authentication authentication)
+	public Response<Object> generarReporteServiciosVel(DatosRequest request, Authentication authentication)
 			throws IOException, ParseException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteServiciosVelDto reporte= gson.fromJson(datosJson, ReporteServiciosVelDto.class);
@@ -69,16 +70,16 @@ public class ReporteServiciosVelImpl implements ReporteServiciosVelService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 		}
 		Map<String, Object> envioDatos = reporteServicios.generarReporte(reporte, reporteServVel);
-		Response<?> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
+		Response<Object> response = providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE GENERO CORRECTAMENTE EL REPORTE SERVICIOS VELATORIOS", IMPRIMIR);
-		return response;
+		return MensajeResponseUtil.mensajeConsultaResponse(response, ERROR_DESCARGA);
 	}
 	
 	@Override
-	public Response<?> buscarOds(DatosRequest request, Authentication authentication) throws IOException {
+	public Response<Object> buscarOds(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-		Response<?> response;
+		Response<Object> response;
 		ReporteServiciosVelDto filtros = gson.fromJson(datosJson, ReporteServiciosVelDto.class);
 		 response = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(reporteServicios.catalogoFolios(request, filtros).getDatos(), urlConsulta,
 					authentication), EXITO);

@@ -10,20 +10,20 @@ import com.imss.sivimss.hoja.consignacion.util.Response;
 
 public interface GenerarHojaConsigService {
 
-	Response<?> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+	Response<Object> buscarArtConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
-	Response<?> generarHojaConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+	Response<Object> generarHojaConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
-	Response<?> generarReporteHojaConsig(DatosRequest request, Authentication authentication) throws IOException;
+	Response<Object> generarReporteHojaConsig(DatosRequest request, Authentication authentication) throws IOException;
 
-	Response<?> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException;
+	Response<Object> buscarCatalogo(DatosRequest request, Authentication authentication) throws IOException;
 
-	Response<?> buscarHojaConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+	Response<Object> buscarHojaConsig(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
-	Response<?> generarReporteConsulta(DatosRequest request, Authentication authentication) throws IOException, ParseException;
+	Response<Object> generarReporteConsulta(DatosRequest request, Authentication authentication) throws IOException, ParseException;
 
-	Response<?> detalleHojaConsig(DatosRequest request, Authentication authentication) throws IOException;
+	Response<Object> detalleHojaConsig(DatosRequest request, Authentication authentication) throws IOException;
 
-	Response<?> adjuntarFactura(DatosRequest request, Authentication authentication) throws IOException;
+	Response<Object> adjuntarFactura(DatosRequest request, Authentication authentication) throws IOException;
 
 }
