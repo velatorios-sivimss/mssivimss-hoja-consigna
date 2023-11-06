@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.imss.sivimss.hoja.consignacion.service.GenerarHojaConsigService;
 import com.imss.sivimss.hoja.consignacion.service.ReporteServiciosVelService;
 import com.imss.sivimss.hoja.consignacion.util.DatosRequest;
 import com.imss.sivimss.hoja.consignacion.util.ProviderServiceRestTemplate;

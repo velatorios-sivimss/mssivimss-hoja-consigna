@@ -69,7 +69,7 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/generar-reporte")
-	public CompletableFuture<Object> generarReporteHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+	public CompletableFuture<Object> generarReporteHojaConsignacion(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
 		Response<Object> response = generarHojaService.generarReporteHojaConsig(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -90,7 +90,7 @@ public class GenerarHojaConsigController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/catalogo")
-	public CompletableFuture<Object> buscarCatalogo(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException{
+	public CompletableFuture<Object> buscarCatalogo(@RequestBody DatosRequest request,Authentication authentication) throws IOException{
 		Response<Object> response = generarHojaService.buscarCatalogo(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

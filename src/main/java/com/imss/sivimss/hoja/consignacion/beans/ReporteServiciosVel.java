@@ -57,7 +57,8 @@ public class ReporteServiciosVel {
 		.join("SVT_PAGO_BITACORA PAG", "ODS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO")
 		.join("SVC_VELATORIO VEL", "ODS.ID_VELATORIO = VEL.ID_VELATORIO")
 		.join("SVC_FACTURA FAC", "PAG.ID_PAGO_BITACORA = FAC.ID_PAGO");
-			queryUtil.where("ODS.ID_ESTATUS_ORDEN_SERVICIO = 4").and("PAG.CVE_ESTATUS_PAGO = 5").and("FAC.IND_ACTIVO = 1");
+			queryUtil.where("ODS.ID_ESTATUS_ORDEN_SERVICIO = 4").and("PAG.CVE_ESTATUS_PAGO = 5").and("FAC.IND_ACTIVO = 1")
+			.and("FAC.ID_ESTATUS_FACTURA = 1").and("FAC.ID_FLUJO_PAGOS = 1");
 			if(filtros.getId_velatorio()!=null) {
 				queryUtil.where("ODS.ID_VELATORIO  ="+filtros.getId_velatorio());
 			}
