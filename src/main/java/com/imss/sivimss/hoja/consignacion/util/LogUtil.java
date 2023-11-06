@@ -1,10 +1,7 @@
 package com.imss.sivimss.hoja.consignacion.util;
 
-import com.google.gson.Gson;
-import com.imss.sivimss.hoja.consignacion.model.request.UsuarioDto;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.io.File;

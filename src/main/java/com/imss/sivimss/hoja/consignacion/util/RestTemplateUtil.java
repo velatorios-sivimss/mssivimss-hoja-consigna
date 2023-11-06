@@ -199,13 +199,12 @@ public class RestTemplateUtil {
 	 */
 	public Response<?> sendPostRequestByteArrayReportesToken(String url, DatosReporteDTO body, String subject,
 			Class<?> clazz) throws IOException {
-		Response<?> responseBody = new Response<>();
 		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
 
 		HttpEntity<Object> request = new HttpEntity<>(body, headers);
 		ResponseEntity<?> responseEntity = null;
 		responseEntity = restTemplate.postForEntity(url, request, clazz);
-		responseBody = (Response<List<String>>) responseEntity.getBody();
+		Response<?> responseBody = (Response<List<String>>) responseEntity.getBody();
 
 		return responseBody;
 	}
