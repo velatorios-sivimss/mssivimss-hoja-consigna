@@ -82,7 +82,7 @@ public class GenerarHojaConsig {
 				+"SOS.ID_ORDEN_SERVICIO AS idOds, "
 				+"PROV.REF_PROVEEDOR " +PROVEEDOR+", "
 				+"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds, "
-				+"SOS.CVE_FOLIO AS folioOds, "
+				+"ART.CVE_FOLIO_ARTICULO AS folioOds, "
 				+"PAQ.REF_PAQUETE_NOMBRE AS paquete, "
 				+"SOE.CVE_FOLIO AS folioOde, "
 				+"CAT.DES_CATEGORIA_ARTICULO AS categoria, "
@@ -418,7 +418,7 @@ public class GenerarHojaConsig {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SUM(ARTS.IMP_COSTO_UNITARIO_ART)+IFNULL(FAC.IMP_COSTO_TOTAL,0) AS costo")
+		queryUtil.select("IFNULL(SUM(ARTS.IMP_COSTO_UNITARIO_ART),0)+IFNULL(FAC.IMP_COSTO_TOTAL,0) AS costo")
 		.from(SVT_ART_HOJA_CONSIGNACION)
 		.leftJoin("SVT_FACTURA_HOJA_CONSIGNACION FAC", "ARTS.ID_HOJA_CONSIGNACION = FAC.ID_HOJA_CONSIGNACION");
 		queryUtil.where("ARTS.ID_HOJA_CONSIGNACION = :id")
