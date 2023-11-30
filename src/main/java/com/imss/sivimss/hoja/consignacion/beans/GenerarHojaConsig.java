@@ -82,9 +82,9 @@ public class GenerarHojaConsig {
 				+"SOS.ID_ORDEN_SERVICIO AS idOds, "
 				+"PROV.REF_PROVEEDOR " +PROVEEDOR+", "
 				+"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds, "
-				+"INV.CVE_FOLIO_ARTICULO AS folioOds, "
+				+"SOS.CVE_FOLIO AS folioOds, "
 				+"PAQ.REF_PAQUETE_NOMBRE AS paquete, "
-				+"SOE.CVE_FOLIO AS folioOde, "
+				+"INV.CVE_FOLIO_ARTICULO AS folioOde, "
 				+"CAT.DES_CATEGORIA_ARTICULO AS categoria, "
 				+"CON.MON_COSTO_UNITARIO AS costoUnitario, "
 				+"CONCAT('$', FORMAT(IFNULL(CON.MON_COSTO_UNITARIO+(CON.MON_COSTO_UNITARIO*0.16),0),2)) AS costoConIva");
