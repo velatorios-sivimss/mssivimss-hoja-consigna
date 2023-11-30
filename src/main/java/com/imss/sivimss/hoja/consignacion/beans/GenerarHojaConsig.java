@@ -82,7 +82,7 @@ public class GenerarHojaConsig {
 				+"SOS.ID_ORDEN_SERVICIO AS idOds, "
 				+"PROV.REF_PROVEEDOR " +PROVEEDOR+", "
 				+"DATE_FORMAT(SOS.FEC_ALTA, '"+fecFormat+"') AS fecOds, "
-				+"ART.CVE_FOLIO_ARTICULO AS folioOds, "
+				+"INV.CVE_FOLIO_ARTICULO AS folioOds, "
 				+"PAQ.REF_PAQUETE_NOMBRE AS paquete, "
 				+"SOE.CVE_FOLIO AS folioOde, "
 				+"CAT.DES_CATEGORIA_ARTICULO AS categoria, "
@@ -103,7 +103,7 @@ public class GenerarHojaConsig {
 		.leftJoin(SVT_PAGO_BITACORA, "SOS.ID_ORDEN_SERVICIO = PAG.ID_REGISTRO ").and(ESTATUS_PAGO).and("PAG.CVE_ESTATUS_PAGO = 5")
 		.leftJoin(SVT_ART_HOJA_CONSIGNACION, "SOS.ID_ORDEN_SERVICIO = ARTS.ID_ORDEN_SERVICIO ");
 		where.append(" ARTS.ID_ORDEN_SERVICIO IS NULL AND CAR.IND_ACTIVO=1 AND DET.IND_ACTIVO=1 "
-				+ " AND INV.ID_TIPO_ASIGNACION_ART = 1 AND (SOS.ID_ESTATUS_ORDEN_SERVICIO = 4 OR SOS.ID_ESTATUS_ORDEN_SERVICIO = 6)");
+				+ " AND INV.ID_TIPO_ASIGNACION_ART = 1 AND SOS.ID_ESTATUS_ORDEN_SERVICIO IN (4,6)");
 		if(filtros.getIdDelegacion()!=null) {
 			where.append(" AND SV.ID_DELEGACION ="+ filtros.getIdDelegacion());
 		}
