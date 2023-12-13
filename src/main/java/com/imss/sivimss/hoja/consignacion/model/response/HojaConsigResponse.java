@@ -20,6 +20,7 @@ public class HojaConsigResponse {
 	private String delegacion;
 	private String fecElaboracion;
 	private String hrElaboracion;
+	private String folioFiscal;
 	private List<ArticulosConsigResponse> artResponse;
 
 }

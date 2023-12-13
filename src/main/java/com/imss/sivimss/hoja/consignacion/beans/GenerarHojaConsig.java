@@ -256,6 +256,7 @@ public class GenerarHojaConsig {
 
 
 	public DatosRequest detalleHojaConsig(DatosRequest request, String fecFormat, String palabra) {
+		log.info("estoy aqui");
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("COUNT(*) totalArt",
@@ -265,11 +266,13 @@ public class GenerarHojaConsig {
 				"DATE_FORMAT(HOJ.FEC_ELABORACION, '"+fecFormat+"') AS fecElaboracion",
 				"HOJ.TIM_HORA_ELABORACION AS hrElaboracion",
 				"SV.DES_VELATORIO AS velatorio",
-				"SD.DES_DELEGACION AS delegacion")
+				"SD.DES_DELEGACION AS delegacion",
+				"IFNULL(FAC.CVE_FOLIO_FISCAL, '') AS folioFiscal")
 		.from(SVT_ART_HOJA_CONSIGNACION)
 		.join(SVT_HOJA_CONSIGNACION, "ARTS.ID_HOJA_CONSIGNACION = HOJ.ID_HOJA_CONSIGNACION")
 		.join(SVC_VELATORIO, "HOJ.ID_VELATORIO = SV.ID_VELATORIO")
-		.join("SVC_DELEGACION SD", "SV.ID_DELEGACION = SD.ID_DELEGACION");
+		.join("SVC_DELEGACION SD", "SV.ID_DELEGACION = SD.ID_DELEGACION")
+		.leftJoin("SVT_FACTURA_HOJA_CONSIGNACION FAC", "HOJ.ID_HOJA_CONSIGNACION = FAC.ID_HOJA_CONSIGNACION");
 		queryUtil.where("HOJ.IND_ACTIVO=1").and("ARTS.IND_ACTIVO=1").and
 		("ARTS.ID_HOJA_CONSIGNACION = " +palabra);
 		String query = obtieneQuery(queryUtil);
