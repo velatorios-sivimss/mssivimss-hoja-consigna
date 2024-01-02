@@ -115,12 +115,12 @@ public class GenerarHojaConsig {
 		}
 		queryUtil.where(where.toString());
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') >= :fecInicio")
-			.setParameter("fecInicio", filtros.getFecInicio());
+			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
+			.setParameter("fecInicio", this.fecInicio+" 00:00:00");
 		}
 		if(filtros.getFecFin()!=null) {
-			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') <= :fecFin")
-			.setParameter("fecFin", filtros.getFecFin());
+			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
+			.setParameter("fecFin", this.fecFin+" 23:59:59");
 		}
 		String query = obtieneQuery(queryUtil);
 		log.info("buscar articulos "+query);
@@ -168,12 +168,12 @@ public class GenerarHojaConsig {
 		}
 		queryUtil.where(where.toString());
 		if(filtros.getFecInicio()!=null) {
-			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') >= :fecInicio")
-			.setParameter("fecInicio", filtros.getFecInicio());
+			queryUtil.where("SOS.FEC_ALTA >= :fecInicio")
+			.setParameter("fecInicio", this.fecInicio+" 00:00:00");
 		}
 		if(filtros.getFecFin()!=null) {
-			queryUtil.where("DATE_FORMAT(SOS.FEC_ALTA, '%d/%m/%Y') <= :fecFin")
-			.setParameter("fecFin", filtros.getFecFin());
+			queryUtil.where("SOS.FEC_ALTA <= :fecFin")
+			.setParameter("fecFin", this.fecFin+" 23:59:59");
 		}
 		String query = obtieneQuery(queryUtil);
 		log.info("datos "+query);
@@ -330,7 +330,7 @@ public class GenerarHojaConsig {
 		q.agregarParametroValues("ID_HOJA_CONSIGNACION", idHojaConsig.toString());
 		q.agregarParametroValues("ID_ARTICULO", articulos.getIdArticulo().toString());
 		q.agregarParametroValues("ID_ORDEN_SERVICIO", articulos.getIdOds().toString());
-		q.agregarParametroValues("ID_PAQUETE", articulos.getIdPaquete().toString());
+		q.agregarParametroValues("ID_PAQUETE", ""+articulos.getIdPaquete()+"");
 		q.agregarParametroValues("REF_CATEGORIA_ART", "'"+articulos.getCategoria()+"'");
 		q.agregarParametroValues("CVE_FOLIO_ODE", "'"+articulos.getFolioOde()+"'");
 		q.agregarParametroValues("IMP_COSTO_UNITARIO_ART", ""+articulos.getCostoConIva()+"");
