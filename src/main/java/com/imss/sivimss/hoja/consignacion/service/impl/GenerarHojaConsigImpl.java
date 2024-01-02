@@ -106,7 +106,7 @@ public class GenerarHojaConsigImpl implements GenerarHojaConsigService{
    	}
    	if(filtros.getFecFin()!=null) {
    		generarHoja.setFecFin(formatFecha(filtros.getFecFin()));
-   	}
+   	} 
    	Response<?> responseDatos = MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicio(generarHoja.buscarArtConsig(request, filtros, fecFormat).getDatos(), urlConsulta,authentication), EXITO); 
        if(responseDatos.getDatos().toString().contains("id")) {
     	   hojaResponse =  Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(generarHoja.datosHojaConsig(request, filtros).getDatos(), urlConsulta,authentication).getDatos(), DatosHojaResponse[].class));
